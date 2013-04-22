@@ -1,0 +1,20 @@
+Components have ports
+A port is a bitarray object
+Components are passed inputs as ports of other components
+
+Components have a delay for passing from input to output.
+
+Component.simulate is called on a component whose input has just changed
+  it returns a Delta object which contains a delta time and a list of ports that
+  should be considered changed after this delta time
+
+Simulation:
+  A list of Delta objects is maintained.
+  The list is sorted by Delta.time
+  The smallest Delta is eliminated:
+    its time interval is subtracted from the other Delta objects
+    its ports are used to list all affected components
+    each affected component is simulate()-ed
+    the resulting Deltas are merged with the Delta list
+
+
