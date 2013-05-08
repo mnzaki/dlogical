@@ -68,13 +68,20 @@ class ParametrizedComponent(Component):
   }
 
   class ParameterMissing(Exception): pass
+  class AbstractComponent(Exception): pass
+
+  def __init__(self, **kwargs):
+    raise self.AbstractComponent(
+      "You can't instantiate this directly! " +
+      "Use %s.with_defaults(port1 = conn1....) instead" % self.__class__.__name__
+    )
 
   @classmethod
   def with_parameters(klass, **kwargs):
-    name = klass.__name__ + "_" + "_".join(map(str, kwargs.values()))
     inputs, outputs = klass.inputs.copy(), klass.outputs.copy()
     params = klass.parameters.copy()
     params.update(kwargs)
+    name = klass.__name__ + "_" + "_".join(map(str, params.values()))
 
     for d in [inputs, outputs]:
       for k in d:
@@ -82,4 +89,11 @@ class ParametrizedComponent(Component):
           try: d[k] = params[d[k]]
           except KeyError: raise klass.ParameterMissing(d[k])
 
-    return type(name, (klass,), dict(inputs = inputs, outputs = outputs))
+    # FIXME I don't like this
+    return type(name, (klass,), dict(__init__ = Component.__init__, inputs = inputs, outputs = outputs))
+
+  @classmethod
+  def with_defaults(klass, **kwargs):
+    if not hasattr(klass, 'default_class'):
+      klass.default_class = klass.with_parameters()
+    return klass.default_class(**kwargs)

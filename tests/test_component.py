@@ -26,7 +26,7 @@ class TestComponentClass(unittest.TestCase):
 
 
 class SomeParametrizedComponent(ParametrizedComponent):
-  parameters = {'width': 8}
+  parameters = {'width': 8, 'width_out': 16}
   inputs = {'in1' : 'width'}
   outputs = {'out1' : 'width_out'}
 
@@ -40,11 +40,18 @@ class TestParametrizedComponents(unittest.TestCase):
     self.assertEqual(klass.inputs['in1'], 16)
     self.assertEqual(klass.outputs['out1'], 8)
 
-  def test_defaults(self):
+  def test_using_some_defaults(self):
     klass = SomeParametrizedComponent.with_parameters(width_out = 4)
     inst = klass()
     self.assertTrue(hasattr(inst, 'in1'))
     self.assertTrue(hasattr(inst, 'out1'))
-
     self.assertEqual(klass.inputs['in1'], 8)
     self.assertEqual(klass.outputs['out1'], 4)
+
+  def test_using_defaults(self):
+    inst = SomeParametrizedComponent.with_defaults()
+    self.assertTrue(hasattr(inst, 'in1'))
+    self.assertTrue(hasattr(inst, 'out1'))
+
+  def test_direct_instantiation(self):
+    self.assertRaises(ParametrizedComponent.AbstractComponent, SomeParametrizedComponent)
