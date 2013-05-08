@@ -93,8 +93,12 @@ class ParametrizedComponent(Component):
           try: d[k] = params[d[k]]
           except KeyError: raise klass.ParameterMissing(d[k])
 
-    # FIXME I don't like this
-    new_klass = type(name, (klass,), dict(__init__ = Component.__init__, inputs = inputs, outputs = outputs))
+    # FIXME I don't like this; this needs a rewrite/redesign
+    # skip ParametrizedComponent's init, but still allow subclasses to have an init
+    init = klass.__init__
+    if init == ParametrizedComponent.__init__:
+      init = Component.__init__
+    new_klass = type(name, (klass,), dict(__init__ = init, inputs = inputs, outputs = outputs))
     new_klass.parameters = params
 
     return new_klass
