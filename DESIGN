@@ -1,6 +1,7 @@
-Components have ports
-A port is a bitarray object
-Components are passed inputs as ports of other components
+Components have Ports
+Components are passed inputs that are Ports of other components
+
+A Port contains a list of connected components
 
 Components have a delay for passing from input to output.
 
@@ -16,5 +17,11 @@ Simulation:
     its ports are used to list all affected components
     each affected component is simulate()-ed
     the resulting Deltas are merged with the Delta list
+
+-------------------------------------------------------------------------------
+
+Target usage example:
+  imem = IMem()
+  regfile = RegisterFile(read1 = imem.instruction(21, 25), ...)
 
 
