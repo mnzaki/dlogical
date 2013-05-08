@@ -1,14 +1,14 @@
-from component import Component
+from component import *
 from ..simulator import Delta
 
-class DRegister32(Component):
+class DRegister(ParametrizedComponent):
   delay = 100
-  inputs = {'q': 32}
-  outputs = {'d': 32}
-
-  def __init__(self, **kwargs):
-    super(DRegister32, self).__init__(**kwargs)
+  parameters  = {'width': 8}
+  inputs = {'q': 'width'}
+  outputs = {'d': 'width'}
 
   def simulate(self):
     self.d.data = self.q.data.copy()
     return Delta(self.delay, [self.d])
+
+DRegister32 = DRegister.with_parameters(width = 32)
