@@ -20,3 +20,6 @@ class TestComponentClass(unittest.TestCase):
     self.assertTrue(hasattr(t2, 'in1'))
     self.assertTrue(hasattr(t2, 'in2'))
 
+  def test_unconnected_input(self):
+    self.assertTrue(hasattr(self.t1, 'in1'))
+    self.assertEqual(int(self.t1.in1.data.to01(), 2), 0)

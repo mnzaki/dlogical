@@ -44,12 +44,17 @@ class Component(object):
   class NoSuchOutputPort(NoSuchPort): pass
 
   def __init__(self, **kwargs):
+    inputs = self.inputs.copy()
     for port_name in kwargs:
-      if port_name not in self.inputs:
+      if port_name not in inputs:
         raise self.NoSuchInputPort(port_name)
-      port_conn = kwargs[port_name]
-      port_conn.connect(self)
-      setattr(self, port_name, port_conn)
+      inputs[port_name] = kwargs[port_name]
+
+    for port_name in inputs:
+      if isinstance(inputs[port_name], int):
+        inputs[port_name] = Port(inputs[port_name])()
+      inputs[port_name].connect(self)
+      setattr(self, port_name, inputs[port_name])
 
     for port_name in self.outputs:
       setattr(self, port_name, Port(self.outputs[port_name]))
