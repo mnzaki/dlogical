@@ -7,7 +7,7 @@ class DRegister32(Component):
   outputs = {'d': 32}
 
   def __init__(self, **kwargs):
-    super(DRegister, self).__init__(**kwargs)
+    super(DRegister32, self).__init__(**kwargs)
 
   def simulate(self):
     self.d.data = self.q.data.copy()
