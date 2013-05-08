@@ -1,6 +1,6 @@
 from bitarray import bitarray
 
-class PortConnection:
+class PortConnection(object):
   def __init__(self, port, start, end):
     self.port = port
     self.start = start
@@ -14,7 +14,7 @@ class PortConnection:
   def connect(self, component):
     self.port.connections.append(component)
 
-class Port:
+class Port(object):
   def __init__(self, width, data = None):
     self.connections = []
     self.width = width
@@ -27,7 +27,7 @@ class Port:
   def __call__(self, start = None, end = None):
     return PortConnection(self, start, end)
 
-class Component:
+class Component(object):
   outputs = {
 #   'output1': output_width
   }
