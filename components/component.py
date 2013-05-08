@@ -61,3 +61,25 @@ class Component(object):
 
   def simulate(self):
     raise NotImplementedError
+
+class ParametrizedComponent(Component):
+  parameters = {
+#    'width1' : some_width
+  }
+
+  class ParameterMissing(Exception): pass
+
+  @classmethod
+  def with_parameters(klass, **kwargs):
+    name = klass.__name__ + "_" + "_".join(map(str, kwargs.values()))
+    inputs, outputs = klass.inputs.copy(), klass.outputs.copy()
+    params = klass.parameters.copy()
+    params.update(kwargs)
+
+    for d in [inputs, outputs]:
+      for k in d:
+        if isinstance(d[k], str):
+          try: d[k] = params[d[k]]
+          except KeyError: raise klass.ParameterMissing(d[k])
+
+    return type(name, (klass,), dict(inputs = inputs, outputs = outputs))

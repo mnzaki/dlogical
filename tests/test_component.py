@@ -23,3 +23,28 @@ class TestComponentClass(unittest.TestCase):
   def test_unconnected_input(self):
     self.assertTrue(hasattr(self.t1, 'in1'))
     self.assertEqual(int(self.t1.in1.data.to01(), 2), 0)
+
+
+class SomeParametrizedComponent(ParametrizedComponent):
+  parameters = {'width': 8}
+  inputs = {'in1' : 'width'}
+  outputs = {'out1' : 'width_out'}
+
+class TestParametrizedComponents(unittest.TestCase):
+  def test_setting(self):
+    klass = SomeParametrizedComponent.with_parameters(width = 16, width_out = 8)
+    inst = klass()
+    self.assertTrue(hasattr(inst, 'in1'))
+    self.assertTrue(hasattr(inst, 'out1'))
+
+    self.assertEqual(klass.inputs['in1'], 16)
+    self.assertEqual(klass.outputs['out1'], 8)
+
+  def test_defaults(self):
+    klass = SomeParametrizedComponent.with_parameters(width_out = 4)
+    inst = klass()
+    self.assertTrue(hasattr(inst, 'in1'))
+    self.assertTrue(hasattr(inst, 'out1'))
+
+    self.assertEqual(klass.inputs['in1'], 8)
+    self.assertEqual(klass.outputs['out1'], 4)
