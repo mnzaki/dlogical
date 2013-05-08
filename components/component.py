@@ -77,10 +77,14 @@ class ParametrizedComponent(Component):
     )
 
   @classmethod
+  def process_parameters(klass, params): pass
+
+  @classmethod
   def with_parameters(klass, **kwargs):
     inputs, outputs = klass.inputs.copy(), klass.outputs.copy()
     params = klass.parameters.copy()
     params.update(kwargs)
+    klass.process_parameters(params)
     name = klass.__name__ + "_" + "_".join(map(str, params.values()))
 
     for d in [inputs, outputs]:

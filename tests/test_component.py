@@ -27,30 +27,39 @@ class TestComponentClass(unittest.TestCase):
 
 class SomeParametrizedComponent(ParametrizedComponent):
   parameters = {'width': 8, 'width_out': 16}
-  inputs = {'in1' : 'width'}
+  inputs = {'in1' : 'width', 'in2': 'width_2'}
   outputs = {'out1' : 'width_out'}
+
+  @classmethod
+  def process_parameters(klass, params):
+    params['width_2'] = params['width'] / 2
 
 class TestParametrizedComponents(unittest.TestCase):
   def test_setting(self):
     klass = SomeParametrizedComponent.with_parameters(width = 16, width_out = 8)
     inst = klass()
     self.assertTrue(hasattr(inst, 'in1'))
+    self.assertTrue(hasattr(inst, 'in2'))
     self.assertTrue(hasattr(inst, 'out1'))
 
     self.assertEqual(klass.inputs['in1'], 16)
+    self.assertEqual(klass.inputs['in2'], 8)
     self.assertEqual(klass.outputs['out1'], 8)
 
   def test_using_some_defaults(self):
     klass = SomeParametrizedComponent.with_parameters(width_out = 4)
     inst = klass()
     self.assertTrue(hasattr(inst, 'in1'))
+    self.assertTrue(hasattr(inst, 'in2'))
     self.assertTrue(hasattr(inst, 'out1'))
     self.assertEqual(klass.inputs['in1'], 8)
+    self.assertEqual(klass.inputs['in2'], 4)
     self.assertEqual(klass.outputs['out1'], 4)
 
   def test_using_defaults(self):
     inst = SomeParametrizedComponent.with_defaults()
     self.assertTrue(hasattr(inst, 'in1'))
+    self.assertTrue(hasattr(inst, 'in2'))
     self.assertTrue(hasattr(inst, 'out1'))
 
   def test_direct_instantiation(self):
