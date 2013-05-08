@@ -9,6 +9,6 @@ class DRegister(ParametrizedComponent):
 
   def simulate(self):
     self.d.data = self.q.data.copy()
-    return Delta(self.delay, [self.d])
+    return self.changed(self.d)
 
 DRegister32 = DRegister.with_parameters(width = 32)

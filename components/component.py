@@ -1,4 +1,5 @@
 from bitarray import bitarray
+from ..simulator import Delta
 
 class PortConnection(object):
   def __init__(self, port, start, end):
@@ -61,6 +62,11 @@ class Component(object):
 
   def simulate(self):
     raise NotImplementedError
+
+  def changed(self, delay = None, *args):
+    if delay is None:
+      delay = self.delay
+    return Delta(delay, args)
 
 class ParametrizedComponent(Component):
   parameters = {
