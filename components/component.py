@@ -90,7 +90,10 @@ class ParametrizedComponent(Component):
           except KeyError: raise klass.ParameterMissing(d[k])
 
     # FIXME I don't like this
-    return type(name, (klass,), dict(__init__ = Component.__init__, inputs = inputs, outputs = outputs))
+    new_klass = type(name, (klass,), dict(__init__ = Component.__init__, inputs = inputs, outputs = outputs))
+    new_klass.parameters = params
+
+    return new_klass
 
   @classmethod
   def with_defaults(klass, **kwargs):
