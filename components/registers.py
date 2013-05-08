@@ -1,5 +1,7 @@
 from component import *
 from ..simulator import Delta
+from bitstring import BitArray
+import math
 
 class DRegister(ParametrizedComponent):
   delay = 100
@@ -8,7 +10,7 @@ class DRegister(ParametrizedComponent):
   outputs = {'d': 'width'}
 
   def simulate(self):
-    self.d.data = self.q.data.copy()
+    self.d.data = BitArray(self.q.data)
     return self.changed(self.d)
 
 DRegister32 = DRegister.with_parameters(width = 32)

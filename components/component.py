@@ -1,4 +1,4 @@
-from bitarray import bitarray
+from bitstring import BitArray
 from ..simulator import Delta
 
 class PortConnection(object):
@@ -16,13 +16,10 @@ class PortConnection(object):
     self.port.connections.append(component)
 
 class Port(object):
-  def __init__(self, width, data = None):
+  def __init__(self, width):
     self.connections = []
     self.width = width
-    if data is not None:
-      self.data = bitarray(data)
-    else:
-      self.data = bitarray('0' * width)
+    self.data = BitArray(length = width)
 
   # A port is 'called' as part of input assignement for a component
   def __call__(self, start = None, end = None):
