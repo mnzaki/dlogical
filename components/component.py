@@ -1,4 +1,3 @@
-from bitstring import BitArray
 from ..simulator import Delta
 
 class PortConnection(object):
@@ -6,26 +5,39 @@ class PortConnection(object):
     self.port = port
     self.start = start
     self.end = end
+    self.mask = ~(~0 << (self.start + 1))
     if start is not None and end is not None:
       self.width = start - end + 1
     else:
       self.width = self.port.width
-    self.data = port.data
+    self.update()
 
   def connect(self, component, port_name):
     self.component = component
     self.port_name = port_name
     self.port.connections.append(self)
 
+  def update(self):
+    self.data = (self.port.data & self.mask) >> self.end
+    return self.data
+
 class Port(object):
   def __init__(self, width):
     self.connections = []
     self.width = width
-    self.data = BitArray(length = width)
+    self.data = 0
 
   # A port is 'called' as part of input assignement for a component
   def __call__(self, start = None, end = None):
+    if start is None: start = self.width - 1
+    if end is None: end = 0
     return PortConnection(self, start, end)
+
+  def __setattr__(self, name, value):
+    object.__setattr__(self, name, value)
+    if name == 'data':
+      for conn in self.connections:
+        conn.update()
 
 class Component(object):
   outputs = {

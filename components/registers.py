@@ -1,6 +1,5 @@
 from component import *
 from ..simulator import Delta
-from bitstring import BitArray
 import math
 
 class DRegister(ParametrizedComponent):
@@ -33,18 +32,16 @@ class RegisterFile(ParametrizedComponent):
 
   def __init__(self, **kwargs):
     Component.__init__(self, **kwargs)
-    self.registers = []
-    for i in xrange(self.parameters['num_regs']):
-      self.registers.append(BitArray(length = self.parameters['width']))
+    self.registers = [0] * self.parameters['num_regs']
 
   def simulate(self, inputs, outputs):
-    if ('write' in inputs or 'write_reg' in inputs) and inputs.write_en.int == 1:
-      self.registers[self.write_reg.data.uint] = BitArray(self.write.data)
+    if ('write' in inputs or 'write_reg' in inputs) and inputs.write_en == 1:
+      self.registers[self.write_reg.data] = self.write.data
       if self.read_reg1.data == self.write_reg.data:
         outputs.read1 = self.write.data
       elif self.read_reg2.data == self.write_reg.data:
         outputs.read2 = self.write.data
     if 'read_reg1' in inputs:
-      outputs.read1 = self.registers[inputs.read_reg1.uint]
+      outputs.read1 = self.registers[inputs.read_reg1]
     if 'read_reg2' in inputs:
-      outputs.read2 = self.registers[inputs.read_reg2.uint]
+      outputs.read2 = self.registers[inputs.read_reg2]

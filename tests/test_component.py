@@ -22,7 +22,7 @@ class TestComponentClass(unittest.TestCase):
 
   def test_unconnected_input(self):
     self.assertTrue(hasattr(self.t1, 'in1'))
-    self.assertEqual(self.t1.in1.data.int, 0)
+    self.assertEqual(self.t1.in1.data, 0)
 
 
 class SomeParametrizedComponent(ParametrizedComponent):

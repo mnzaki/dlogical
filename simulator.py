@@ -1,5 +1,4 @@
 from heapq import heappush, heappop
-from bitstring import BitArray
 
 class Message(dict):
   def __init__(self, **kwargs):
@@ -33,7 +32,7 @@ class Simulator:
           for connection in port.connections:
             if conn.component not in affected:
               affected[conn.component] = Message()
-            affected[conn.component][conn.port_name] = BitArray(port.data)
+            affected[conn.component][conn.port_name] = conn.update()
 
     # create a list of new deltas generated as a side-effect of simulating the
     # affected components
@@ -49,7 +48,7 @@ class Simulator:
       for port_name, val in outputs_msg.iteritems():
         # FIXME throw exception if port could not be found
         delta_ports.append(getattr(component, port_name))
-        setattr(component, port_name, BitArray(val))
+        getattr(component, port_name).data = val
 
       # push this delta if it is non-empty
       if len(delta_ports) != 0:

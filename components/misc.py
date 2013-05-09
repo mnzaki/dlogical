@@ -1,5 +1,4 @@
 from component import *
-from bitstring import BitArray
 
 class Mux(Component):
   delay = 50
@@ -24,7 +23,7 @@ class Adder32(Component):
   def simulate(self, ins, outs):
     if len(s) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
-      outs.out = BitArray(length = 32, self.in0.data.int + self.in1.data.int)
+      outs.out = self.in0.data + self.in1.data
 
 # FIXME parametrize
 class SLL2(Component):
@@ -36,7 +35,7 @@ class SLL2(Component):
   def simulate(self, ins, outs):
     if len(s) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
-      outs.out = BitArray(length = 32, self.in.data.uint << 2)
+      outs.out = self.in.data << 2
 
 class SignExt(Component):
   delay = 50
@@ -47,4 +46,4 @@ class SignExt(Component):
   def simulate(self, ins, outs):
     if len(s) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
-      outs.out = BitArray(length = 32, self.in.data.uint)
+      outs.out = self.in.data
