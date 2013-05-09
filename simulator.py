@@ -32,7 +32,7 @@ class Simulator:
     new_deltas = []
     for component, port_names in affected.iteritems():
       deltas = component.simulate(port_names)
-      if deltas is not None:
+      if deltas is not None and len(deltas) != 0:
         new_deltas.append(deltas)
 
     while self.deltas[0].time == 0:
