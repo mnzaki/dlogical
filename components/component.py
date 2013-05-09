@@ -13,8 +13,9 @@ class PortConnection(object):
     self.data = port.data
 
   def connect(self, component, port_name):
-    self.port.connections.append(component)
-    self.receiver_port_name = port_name
+    self.component = component
+    self.port_name = port_name
+    self.port.connections.append(self)
 
 class Port(object):
   def __init__(self, width):
@@ -61,7 +62,7 @@ class Component(object):
       setattr(self, port_name, port)
       self.output_ports.append(port)
 
-  def simulate(self):
+  def simulate(self, ports):
     raise NotImplementedError
 
   def changed(self, delay = None, *args):

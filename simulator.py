@@ -18,13 +18,22 @@ class Simulator:
     self.deltas = []
 
   def step(self):
-    new_deltas = []
+    # create a mapping of affected components to array of affected ports
+    affected = {}
     for delta in self.deltas:
       delta.time -= self.deltas[0].time
       if delta.time == 0:
         for port in delta.ports:
-          for affected in port.connections:
-            new_deltas.append(affected.simulate())
+          for connection in port.connections:
+            if conn.component not in affected:
+              affected[conn.component] = []
+            affected[conn.component].append(conn.port_name)
+
+    new_deltas = []
+    for component, port_names in affected.iteritems():
+      deltas = component.simulate(port_names)
+      if deltas is not None:
+        new_deltas.append(deltas)
 
     while self.deltas[0].time == 0:
       heappop(self.deltas)
