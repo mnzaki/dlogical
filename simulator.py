@@ -1,4 +1,4 @@
-from heapq import heappush
+from heapq import heappush, heappop
 
 class Delta:
   def __init__(self, time, ports):
@@ -31,9 +31,9 @@ class Simulator:
 
     new_deltas = []
     for component, port_names in affected.iteritems():
-      deltas = component.simulate(port_names)
-      if deltas is not None and len(deltas) != 0:
-        new_deltas.append(deltas)
+      delta = component.simulate(port_names)
+      if delta is not None and len(delta.ports) != 0:
+        new_deltas.append(delta)
 
     while self.deltas[0].time == 0:
       heappop(self.deltas)
