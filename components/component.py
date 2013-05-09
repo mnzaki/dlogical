@@ -54,8 +54,11 @@ class Component(object):
       inputs[port_name].connect(self)
       setattr(self, port_name, inputs[port_name])
 
+    self.output_ports = []
     for port_name in self.outputs:
-      setattr(self, port_name, Port(self.outputs[port_name]))
+      port = Port(self.outputs[port_name])
+      setattr(self, port_name, port)
+      self.output_ports.append(port)
 
   def simulate(self):
     raise NotImplementedError
@@ -63,6 +66,8 @@ class Component(object):
   def changed(self, delay = None, *args):
     if delay is None:
       delay = self.delay
+    if len(args) == 0:
+      args = self.output_ports
     return Delta(delay, args)
 
 class ParametrizedComponent(Component):

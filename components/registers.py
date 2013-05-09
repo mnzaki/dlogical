@@ -11,6 +11,6 @@ class DRegister(ParametrizedComponent):
 
   def simulate(self):
     self.d.data = BitArray(self.q.data)
-    return self.changed(self.d)
+    return self.changed()
 
 DRegister32 = DRegister.with_parameters(width = 32)
