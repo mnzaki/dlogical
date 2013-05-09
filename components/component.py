@@ -65,12 +65,11 @@ class Component(object):
   def simulate(self, ports):
     raise NotImplementedError
 
-  def changed(self, delay = None, *args):
-    if delay is None:
-      delay = self.delay
+  def changed(self, *args):
     if len(args) == 0:
-      args = self.output_ports
-    return Delta(delay, args)
+      return None
+    else:
+      return Delta(self.delay, args)
 
 class ParametrizedComponent(Component):
   parameters = {

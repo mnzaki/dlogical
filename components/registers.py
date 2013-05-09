@@ -12,6 +12,6 @@ class DRegister(ParametrizedComponent):
   def simulate(self, ports):
     if 'q' in ports:
       self.d.data = BitArray(self.q.data)
-      return self.changed()
+      return self.changed(self.d)
 
 DRegister32 = DRegister.with_parameters(width = 32)
