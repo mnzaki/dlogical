@@ -12,8 +12,9 @@ class PortConnection(object):
       self.width = self.port.width
     self.data = port.data
 
-  def connect(self, component):
+  def connect(self, component, port_name):
     self.port.connections.append(component)
+    self.receiver_port_name = port_name
 
 class Port(object):
   def __init__(self, width):
@@ -51,7 +52,7 @@ class Component(object):
     for port_name in inputs:
       if isinstance(inputs[port_name], int):
         inputs[port_name] = Port(inputs[port_name])()
-      inputs[port_name].connect(self)
+      inputs[port_name].connect(self, port_name)
       setattr(self, port_name, inputs[port_name])
 
     self.output_ports = []
