@@ -9,10 +9,9 @@ class DRegister(ParametrizedComponent):
   inputs = {'q': 'width'}
   outputs = {'d': 'width'}
 
-  def simulate(self, ports):
-    if 'q' in ports:
-      self.d.data = BitArray(self.q.data)
-      return self.changed(self.d)
+  def simulate(self, inputs, outputs):
+    if 'q' in inputs:
+      outputs.d = inputs.q
 
 DRegister32 = DRegister.with_parameters(width = 32)
 
@@ -24,7 +23,7 @@ class RegisterFile(ParametrizedComponent):
 
   inputs  = {'read_reg1' : 'log_num_regs', 'read_reg2' : 'log_num_regs',
              'write_reg' : 'log_num_regs', 'write': 'width',
-             'reg_write': 1}
+             'write_en': 1}
 
   outputs = {'read1': 'width', 'read2': 'width'}
 
@@ -38,15 +37,10 @@ class RegisterFile(ParametrizedComponent):
     while xrange(self.parameters['num_regs']):
       self.registers.append(BitArray(length = params['width']))
 
-  def simulate(self, ports):
-    changes = []
-    if self.reg_write.int == 1:
+  def simulate(self, inputs, outputs):
+    if ('write_data' in inputs or 'write_reg' in inputs) and self.write_en.data.uint == 1:
       self.registers[self.write_reg.data.uint] = BitArray(self.write.data)
-    if 'read_reg1' in ports:
-      self.read1.data = BitArray(self.registers[self.read_reg1.data.uint])
-      changes.append(self.read1)
-    if 'read_reg2' in ports:
-      self.read2.data = BitArray(self.registers[self.read_reg2.data.uint])
-      changes.append(self.read2)
-
-    return self.changed(*changes)
+    if 'read_reg1' in inputs:
+      outputs.read1 = self.registers[inputs.read_reg1.uint]
+    if 'read_reg2' in inputs:
+      outputs.read2 = self.registers[inputs.read_reg2.uint]
