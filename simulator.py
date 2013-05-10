@@ -20,11 +20,15 @@ class Delta:
 
 class Simulator:
   def __init__(self, deltas = []):
-    self.deltas = heapify(deltas)
+    heapify(deltas)
+    self.deltas = deltas
 
-  def inject(self, deltas):
-    for d in deltas:
-      heappush(self.deltas, d)
+  def inject(self, inp):
+    if isinstance(inp, Delta):
+      heappush(self.deltas, inp)
+    else:
+      for delta in inp:
+        heappush(self.deltas, delta)
 
   def step(self):
     # create a mapping of affected components to messages of affected inputs
@@ -33,7 +37,7 @@ class Simulator:
       delta.time -= self.deltas[0].time
       if delta.time == 0:
         for port in delta.ports:
-          for connection in port.connections:
+          for conn in port.connections:
             if conn.component not in affected:
               affected[conn.component] = Message()
             affected[conn.component][conn.port_name] = conn.update()
@@ -59,7 +63,7 @@ class Simulator:
         new_deltas.append(Delta(delay, delta_ports))
 
     # pop all the deltas that have been processed
-    while self.deltas[0].time == 0:
+    while self.deltas and self.deltas[0].time == 0:
       heappop(self.deltas)
 
     # push all the deltas that require processing
