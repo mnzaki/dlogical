@@ -30,7 +30,7 @@ class Port(object):
     self.width_mask = ~(~0 << width)
     self.data = data
 
-  # A port is 'called' as part of input assignement for a component
+  # A port is 'sliced' as part of input assignement for a component
   def __getitem__(self, key):
     if isinstance(key, slice):
       if key.step is not None:
