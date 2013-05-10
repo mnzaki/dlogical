@@ -4,7 +4,7 @@ from alu import ALU
 
 # This is the main control unit implemented as per the diagram
 # on page 24 of Lecture 5
-class CPU(Component):
+class ControlUnit(Component):
   delay = 200
 
   inputs  = {'opcode':   6}
@@ -31,7 +31,7 @@ class CPU(Component):
     outs.jump = is_jmp
     outs.branch = is_beq
     outs.memread = is_lw
-    outs.memtoreg = is_lw 
+    outs.memtoreg = is_lw
     outs.memwrite = is_sw
     outs.alusrc = is_lw | is_sw
     outs.regwrite = is_rtype | is_lw
@@ -43,7 +43,7 @@ class CPU(Component):
     elif is_beq or is_jmp:
       outs.aluop = 0b01
 
-class ALUControl(Component):
+class ALUControlUnit(Component):
   delay = 200
 
   inputs  = {'aluop':      2,
