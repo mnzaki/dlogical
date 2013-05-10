@@ -24,11 +24,11 @@ class PortConnection(object):
 class Port(object):
   class InvalidPortSlice(Exception): pass
 
-  def __init__(self, width):
+  def __init__(self, width, data = 0):
     self.connections = []
     self.width = width
     self.width_mask = ~(~0 << width)
-    self.data = 0
+    self.data = data
 
   # A port is 'called' as part of input assignement for a component
   def __getitem__(self, key):
@@ -68,25 +68,37 @@ class Component(object):
   class NoSuchPort(Exception): pass
   class NoSuchInputPort(NoSuchPort): pass
   class NoSuchOutputPort(NoSuchPort): pass
+  class InvalidPortConnection(Exception): pass
 
   def __init__(self, **kwargs):
     inputs = self.inputs.copy()
     for port_name in kwargs:
-      if port_name not in inputs:
-        raise self.NoSuchInputPort(port_name)
-      inputs[port_name] = kwargs[port_name]
+      try: inputs.pop(port_name)
+      except KeyError: raise self.NoSuchInputPort(port_name)
+      setattr(self, port_name, kwargs[port_name])
 
     for port_name in inputs:
-      if isinstance(inputs[port_name], int):
-        inputs[port_name] = Port(inputs[port_name])[:]
-      inputs[port_name].connect(self, port_name)
-      setattr(self, port_name, inputs[port_name])
+      setattr(self, port_name, 0)
 
     self.output_ports = []
     for port_name in self.outputs:
       port = Port(self.outputs[port_name])
       setattr(self, port_name, port)
       self.output_ports.append(port)
+
+  def __setattr__(self, name, value):
+    if name in self.inputs:
+      if isinstance(value, int):
+        # create a dummy port simply to hold this value
+        value = Port(self.inputs[name], value)[:]
+      if not isinstance(value, PortConnection):
+        raise self.InvalidPortConnection(value)
+      value.connect(self, name)
+
+    if name in self.outputs and hasattr(self, name):
+      raise self.InvalidPortConnection("You cannot change an output port of a component!")
+
+    super(Component, self).__setattr__(name, value)
 
   def simulate(self, ports):
     raise NotImplementedError
