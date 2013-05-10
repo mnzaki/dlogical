@@ -109,6 +109,32 @@ class Component(object):
     else:
       return Delta(self.delay, args)
 
+# FIXME this feels like such a hack
+# Usage is supposed to be like a normal PortConnection for Component inputs
+class Wire(PortConnection):
+  def __init__(self, *args):
+    self.width = 0
+    for pos, arg in args:
+      # FIXME support a mix of connections and constant values
+      if not isinstance(arg, PortConnection):
+        raise Exception("A wire must consist of PortConnections!")
+      self.width += arg.width
+      arg.connect(self, "conn%i" % pos)
+
+    self.port = Port(self.width)
+    self.update()
+
+  def update(self):
+    width = 0
+    self.data = 0
+    for conn in self.port.connections:
+      self.data |= conn.data << width
+      width += conn.width
+    return self.data
+
+  def simulate(self, ins, outs):
+    self.update()
+
 class ParametrizedComponent(Component):
   parameters = {
 #    'width1' : some_width
