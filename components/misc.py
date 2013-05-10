@@ -1,5 +1,15 @@
 from component import *
 
+class AndGate(Component):
+  delay = 10
+
+  inputs  = {'in0': 1, 'in1': 1}
+  outputs = {'out': 1}
+
+  def simulate(self, ins, outs):
+    if len(ins) > 0:
+      outs.out = self.in0.data & self.in1.data
+
 class Mux(Component):
   delay = 50
 
