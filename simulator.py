@@ -1,4 +1,4 @@
-from heapq import heappush, heappop
+from heapq import heappush, heappop, heapify
 
 class Message(dict):
   def __init__(self, **kwargs):
@@ -19,8 +19,12 @@ class Delta:
       return 0
 
 class Simulator:
-  def __init__(self):
-    self.deltas = []
+  def __init__(self, deltas = []):
+    self.deltas = heapify(deltas)
+
+  def inject(self, deltas):
+    for d in deltas:
+      heappush(self.deltas, d)
 
   def step(self):
     # create a mapping of affected components to messages of affected inputs
