@@ -39,21 +39,21 @@ class Adder32(Component):
 class SLL2(Component):
   delay = 50
 
-  inputs = {'in': 32}
+  inputs = {'inp': 32}
   outputs = {'out': 32}
 
   def simulate(self, ins, outs):
     if len(s) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
-      outs.out = self.in.data << 2
+      outs.out = self.inp.data << 2
 
 class SignExt(Component):
   delay = 50
 
-  inputs = {'in': 16}
+  inputs = {'inp': 16}
   outputs = {'out': 32}
 
   def simulate(self, ins, outs):
     if len(s) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
-      outs.out = self.in.data
+      outs.out = self.inp.data
