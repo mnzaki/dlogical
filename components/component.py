@@ -22,6 +22,8 @@ class PortConnection(object):
     return self.data
 
 class Port(object):
+  class InvalidPortSlice(Exception): pass
+
   def __init__(self, width):
     self.connections = []
     self.width = width
@@ -29,9 +31,18 @@ class Port(object):
     self.data = 0
 
   # A port is 'called' as part of input assignement for a component
-  def __call__(self, start = None, end = None):
-    if start is None: start = self.width - 1
-    if end is None: end = 0
+  def __getitem__(self, key):
+    if isinstance(key, slice):
+      if key.step is not None:
+        raise self.InvalidPortSlice("Ports cannot be accessed with step arguments!")
+      start = key.start or (self.width - 1)
+      end = key.stop or 0
+    elif isinstance(key, int):
+      start = key
+      end = key
+    else:
+      raise self.InvalidPortSlice("Ports can either be accessed with slices or indices!")
+
     return PortConnection(self, start, end)
 
   def __setattr__(self, name, value):
@@ -67,7 +78,7 @@ class Component(object):
 
     for port_name in inputs:
       if isinstance(inputs[port_name], int):
-        inputs[port_name] = Port(inputs[port_name])()
+        inputs[port_name] = Port(inputs[port_name])[:]
       inputs[port_name].connect(self, port_name)
       setattr(self, port_name, inputs[port_name])
 

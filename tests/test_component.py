@@ -8,21 +8,28 @@ class SomeComponent(Component):
 class TestComponentClass(unittest.TestCase):
   def setUp(self):
     self.t1 = SomeComponent()
+    self.t1.out1.data = 1
+    self.t1.out2.data = 0b0110
 
   def test_nonexistent_input(self):
-    self.assertRaises(Component.NoSuchInputPort, SomeComponent, nonexistent = self.t1.out1())
+    self.assertRaises(Component.NoSuchInputPort, SomeComponent, nonexistent = self.t1.out1[:])
 
   def test_component_creation(self):
     self.assertTrue(hasattr(self.t1, 'out1'))
     self.assertTrue(hasattr(self.t1, 'out2'))
 
-    t2 = SomeComponent(in1 = self.t1.out1(), in2 = self.t1.out2())
+    t2 = SomeComponent(in1 = self.t1.out1[:], in2 = self.t1.out2[:])
     self.assertTrue(hasattr(t2, 'in1'))
     self.assertTrue(hasattr(t2, 'in2'))
 
   def test_unconnected_input(self):
     self.assertTrue(hasattr(self.t1, 'in1'))
     self.assertEqual(self.t1.in1.data, 0)
+
+  def test_port_slices(self):
+    t2 = SomeComponent(in1 = self.t1.out1[0], in2 = self.t1.out2[1:0])
+    self.assertEqual(t2.in1.data, 1)
+    self.assertEqual(t2.in2.data, 0b10)
 
 
 class SomeParametrizedComponent(ParametrizedComponent):
