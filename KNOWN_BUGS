@@ -1,0 +1,4 @@
+Initial values of outputs of a component are not set properly.
+
+Wire()s cause a lost simulation cycle
+
