@@ -8,7 +8,8 @@ class Mem(ParametrizedComponent):
 
   inputs  = {'addr':     'log_size',
              'write':    'width',
-             'write_en': 1}
+             'write_en': 1,
+             'read_en':  1}
 
   outputs = {'read':     'width'}
 
@@ -23,6 +24,5 @@ class Mem(ParametrizedComponent):
   def simulate(self, ins, outs):
     if self.write_en.data == 1:
       self.mem[self.addr.data] = self.write.data
-      outs.read = self.write.data
-    elif 'addr' in ins:
-      outs.read = self.mem[ins.addr]
+    if self.read_en.data == 1:
+      outs.read = self.mem[self.addr.data]
