@@ -25,6 +25,7 @@ class Port(object):
   def __init__(self, width):
     self.connections = []
     self.width = width
+    self.width_mask = ~(~0 << width)
     self.data = 0
 
   # A port is 'called' as part of input assignement for a component
@@ -34,6 +35,8 @@ class Port(object):
     return PortConnection(self, start, end)
 
   def __setattr__(self, name, value):
+    if name == 'data':
+      value &= self.width_mask
     object.__setattr__(self, name, value)
     if name == 'data':
       for conn in self.connections:
