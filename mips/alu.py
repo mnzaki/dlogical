@@ -29,4 +29,4 @@ class ALU(Component):
       outs.out = ~(self.in0.data | self.in1.data)
 
     if outs.out == 0:
-      outs.zero = 0
+      outs.zero = 1
