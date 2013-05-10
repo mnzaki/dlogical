@@ -8,15 +8,15 @@ class ALU(Component):
 
   # FIXME check changes?
   def simulate(self, ins, outs):
-    if self.control.data == 0:
+    if self.control.data == 0b0000:
       outs.out = self.in0.data & self.in1.data
-    elif self.control.data == 1:
+    elif self.control.data == 0b0001:
+      outs.out = self.in0.data | self.in1.data
+    elif self.control.data == 0b0010:
       outs.out = self.in0.data + self.in1.data
-    elif self.control.data == 2:
-      outs.out = self.in0.data + self.in1.data
-    elif self.control.data == 3:
-      outs.out = self.in0.data + self.in1.data
-    elif self.control.data == 4:
-      outs.out = self.in0.data + self.in1.data
-    elif self.control.data == 5:
-      outs.out = self.in0.data + self.in1.data
+    elif self.control.data == 0b0110:
+      outs.out = self.in0.data - self.in1.data
+    elif self.control.data == 0b0111:
+      outs.out = self.in0.data < self.in1.data #FIXME?
+    elif self.control.data == 0b1100:
+      outs.out = ~(self.in0.data | self.in1.data)
