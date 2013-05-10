@@ -6,10 +6,7 @@ class PortConnection(object):
     self.start = start
     self.end = end
     self.mask = ~(~0 << (self.start + 1))
-    if start is not None and end is not None:
-      self.width = start - end + 1
-    else:
-      self.width = self.port.width
+    self.width = start - end + 1
     self.update()
 
   def connect(self, component, port_name):
@@ -18,7 +15,10 @@ class PortConnection(object):
     self.port.connections.append(self)
 
   def update(self):
-    self.data = (self.port.data & self.mask) >> self.end
+    if self.width == self.port.width:
+      self.data = self.port.data
+    else:
+      self.data = (self.port.data & self.mask) >> self.end
     return self.data
 
 class Port(object):
