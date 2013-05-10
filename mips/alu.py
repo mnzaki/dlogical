@@ -11,7 +11,7 @@ class ALU(Component):
   delay = 500
 
   inputs = {'in0': 32, 'in1': 32, 'control': 4}
-  outputs = {'out': 1}
+  outputs = {'out': 32, 'zero' : 1}
 
   # FIXME check changes?
   def simulate(self, ins, outs):
@@ -27,3 +27,6 @@ class ALU(Component):
       outs.out = self.in0.data < self.in1.data #FIXME?
     elif self.control.data == self.NOR_OP:
       outs.out = ~(self.in0.data | self.in1.data)
+
+    if outs.out == 0:
+      outs.zero = 0
