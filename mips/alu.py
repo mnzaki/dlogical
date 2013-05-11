@@ -1,4 +1,4 @@
-from mips_sim.components.component import *
+from components.component import *
 
 class ALU(Component):
   AND_OP = 0b0000

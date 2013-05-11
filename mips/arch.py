@@ -1,8 +1,8 @@
 from control import *
 from alu import ALU
-from mips_sim.components.misc import *
-from mips_sim.components.registers import *
-from mips_sim.components.mem import Mem
+from components.misc import *
+from components.registers import *
+from components.mem import Mem
 
 # It starts with a counter :')
 pc = DRegister32()

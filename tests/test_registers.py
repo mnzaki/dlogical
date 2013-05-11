@@ -1,8 +1,8 @@
 import unittest
 
-from .helpers.components import *
-from ..components.registers import *
-from ..simulator import Message, Delta
+from helpers.components import *
+from components.registers import *
+from simulator import Message, Delta
 
 class TestDRegister32(ComponentTest):
   def test_dregister32(self):

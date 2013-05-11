@@ -1,5 +1,5 @@
 import unittest
-from ..components.component import *
+from components.component import *
 
 class SomeComponent(Component):
   inputs = {'in1': 8, 'in2': 4}

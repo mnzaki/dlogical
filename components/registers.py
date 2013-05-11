@@ -1,5 +1,5 @@
 from component import *
-from mips_sim.simulator import Delta
+from simulator import Delta
 import math
 
 class DRegister(ParametrizedComponent):

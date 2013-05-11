@@ -1,7 +1,6 @@
 import unittest
 
-from ...components.registers import *
-from ...simulator import Message, Delta
+from simulator import Message, Delta
 
 class ComponentTest(unittest.TestCase):
   def assertSimulates(self, component, ins, outs):

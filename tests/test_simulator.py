@@ -1,7 +1,7 @@
 import unittest
-from ..simulator import *
-from ..components.misc import *
-from ..components.registers import *
+from simulator import *
+from components.misc import *
+from components.registers import *
 
 class TestSimulator(unittest.TestCase):
   def test_simple_counter(self):

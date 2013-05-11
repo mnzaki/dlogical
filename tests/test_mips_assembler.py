@@ -1,5 +1,5 @@
 import unittest
-from ..mips.asm import Assembler
+from mips.asm import Assembler
 from bitstring import BitArray
 
 class TestMipsAssembler(unittest.TestCase):
