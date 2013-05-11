@@ -1,5 +1,5 @@
-from control import *
-from alu import ALU
+from mips.control import *
+from mips.alu import ALU
 from components.misc import *
 from components.registers import *
 from components.mem import Mem
