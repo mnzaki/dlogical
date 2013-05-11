@@ -19,9 +19,10 @@ class Delta:
       return 0
 
 class Simulator:
-  def __init__(self, deltas = []):
+  def __init__(self, deltas = [], new_deltas_cb = None):
     heapify(deltas)
     self.deltas = deltas
+    self.new_deltas_cb = new_deltas_cb
 
   def inject(self, inp):
     if isinstance(inp, Delta):
@@ -61,6 +62,9 @@ class Simulator:
       # push this delta if it is non-empty
       if len(delta_ports) != 0:
         new_deltas.append(Delta(delay, delta_ports))
+
+    if self.new_deltas_cb:
+      self.new_deltas_cb(new_deltas)
 
     # pop all the deltas that have been processed
     while self.deltas and self.deltas[0].time == 0:
