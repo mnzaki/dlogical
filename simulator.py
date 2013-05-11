@@ -44,8 +44,9 @@ class Simulator:
   def step(self):
     # create a mapping of affected components to messages of affected inputs
     affected = {}
+    delta_time = self.deltas[0].time
     for delta in self.deltas:
-      delta.time -= self.deltas[0].time
+      delta.time -= delta_time
       if delta.time == 0:
         for port in delta.ports:
           for conn in port.connections:
@@ -73,9 +74,6 @@ class Simulator:
       if len(delta_ports) != 0:
         new_deltas.append(Delta(delay, delta_ports))
 
-    if self.new_deltas_cb:
-      self.new_deltas_cb(new_deltas)
-
     # pop all the deltas that have been processed
     while self.deltas and self.deltas[0].time == 0:
       heappop(self.deltas)
@@ -83,3 +81,6 @@ class Simulator:
     # push all the deltas that require processing
     for delta in new_deltas:
       heappush(self.deltas, delta)
+
+    if self.new_deltas_cb:
+      self.new_deltas_cb(self, affected, new_deltas)
