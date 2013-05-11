@@ -1,0 +1,5 @@
+addi(t1, zero, 9)
+sll(t1, t1, 2)
+label('L1')
+lw(t2, t0, 0)
+beq(t3, zero, L1)
