@@ -43,7 +43,7 @@ class SLL2(Component):
   outputs = {'out': 32}
 
   def simulate(self, ins, outs):
-    if len(s) > 0:
+    if len(ins) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
       outs.out = self.inp.data << 2
 
@@ -54,6 +54,6 @@ class SignExt(Component):
   outputs = {'out': 32}
 
   def simulate(self, ins, outs):
-    if len(s) > 0:
+    if len(ins) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
       outs.out = self.inp.data
