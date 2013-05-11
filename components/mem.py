@@ -1,4 +1,4 @@
-from ..component import ParametrizedComponent
+from component import *
 import math
 
 class Mem(ParametrizedComponent):
@@ -17,9 +17,10 @@ class Mem(ParametrizedComponent):
   def process_parameters(klass, params):
     params['log_size'] = int(math.ceil(math.log(params['size'], 2)))
 
-  def __init__(self, mem = None):
+  def __init__(self, mem = None, **kwargs):
     mem = mem or [0] * self.parameters['size']
     self.mem = mem
+    Component.__init__(self, **kwargs)
 
   def simulate(self, ins, outs):
     if self.write_en.data == 1:
