@@ -7,7 +7,10 @@ from components.mem import Mem
 # It starts with a counter :')
 pc = DRegister32()
 
-imem = Mem.with_parameters(width = 32, size = 1024)(addr = pc.d[:], write_en = 0)
+imem = Mem.with_parameters(width = 32, size = 1024)(
+        addr = pc.d[:],
+        write_en = 0,
+        read_en = 1)
 
 control = ControlUnit(opcode = imem.read[31:26])
 alucontrol = ALUControlUnit(aluop = control.aluop[:],
