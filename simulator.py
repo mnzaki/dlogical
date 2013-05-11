@@ -3,7 +3,10 @@ from heapq import heappush, heappop, heapify
 class Message(dict):
   def __init__(self, **kwargs):
     dict.__init__(self, kwargs)
-    self.__dict__ = self
+  def __getattr__(self, attr):
+    return self[attr]
+  def __setattr__(self, attr, val):
+    self[attr] = val
 
 class Delta:
   def __init__(self, time, ports):
