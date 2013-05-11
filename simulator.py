@@ -1,12 +1,7 @@
 from heapq import heappush, heappop, heapify
+from utils import Bunch
 
-class Message(dict):
-  def __init__(self, **kwargs):
-    dict.__init__(self, kwargs)
-  def __getattr__(self, attr):
-    return self[attr]
-  def __setattr__(self, attr, val):
-    self[attr] = val
+class Message(Bunch): pass
 
 class Delta:
   def __init__(self, time, ports):
