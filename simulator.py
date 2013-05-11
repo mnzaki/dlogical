@@ -21,6 +21,13 @@ class Delta:
     else:
       return 0
 
+  def __repr__(self):
+    affected = []
+    for port in self.ports:
+      affected.extend(port.connections)
+
+    return "Delta(%i, %i => %s)" % (self.time, self.ports[0].data, affected)
+
 class Simulator:
   def __init__(self, deltas = [], new_deltas_cb = None):
     heapify(deltas)

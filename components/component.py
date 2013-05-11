@@ -21,6 +21,9 @@ class PortConnection(object):
       self.data = (self.port.data & self.mask) >> self.end
     return self.data
 
+  def __repr__(self):
+    return "%s:%s" % (self.component, self.port_name)
+
 class Port(object):
   class InvalidPortSlice(Exception): pass
 
@@ -108,6 +111,13 @@ class Component(object):
       return None
     else:
       return Delta(self.delay, args)
+
+  def __repr__(self):
+    name = "Unnamed"
+    if hasattr(self, 'name'):
+      name = self.name
+    return "%s(%s)" % (name, self.__class__.__name__)
+
 
 # FIXME this feels like such a hack
 # Usage is supposed to be like a normal PortConnection for Component inputs
