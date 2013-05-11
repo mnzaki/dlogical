@@ -10,7 +10,9 @@ pc = DRegister32()
 imem = Mem.with_parameters(width = 32, size = 1024)(addr = pc.d[:], write_en = 0)
 
 control = ControlUnit(opcode = imem[31:26])
-alucontrol = ALUControlUnit(aluop = control.aluop[:], funct = imem.read[5:0])
+alucontrol = ALUControlUnit(aluop = control.aluop[:],
+                            funct = imem.read[5:0],
+                            opcode = imem.read[31:26])
 
 write_reg_mux = Mux(in0 = imem.read[20:16], in1 = imem.read[15:11], s = control.regdst[:])
 
@@ -44,9 +46,9 @@ branch_and_gate = AndGate(in0 = control.branch[:], in1 = alu.zero[:])
 branch_mux = Mux(in0 = pc_add4.out[:], in1 = branch_adder.out[:], s = branch_and_gate.out[:])
 
 jmp_sll2 = SLL2(inp = imem.read[25:0])
-pc_upate_mux = Mux(in0 = branch_mux.out[:],
-                   in1 = Wire(jmp_sll2.out[:], pc_add4.out[31:28]),
-                   s   = control.jump[:])
+pc_update_mux = Mux(in0 = branch_mux.out[:],
+                    in1 = Wire(jmp_sll2.out[:], pc_add4.out[31:28]),
+                    s   = control.jump[:])
 
 # And it ends with a counter update
-pc.q = pc_upate_mux.out[:]
+pc.q = pc_update_mux.out[:]
