@@ -1,4 +1,4 @@
-from ..simulator import Delta
+from mips_sim.simulator import Delta
 
 class PortConnection(object):
   def __init__(self, port, start, end):

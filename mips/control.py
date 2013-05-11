@@ -1,4 +1,4 @@
-from ..components.component import *
+from mips_sim.components.component import *
 import arch
 from alu import ALU
 
