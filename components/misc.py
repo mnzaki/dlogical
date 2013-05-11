@@ -18,10 +18,10 @@ class Mux(Component):
 
   # FIXME check changes
   def simulate(self, ins, outs):
-    if self.s.data.int == 0:
-      outs.out = self.ins0.data
+    if self.s.data == 0:
+      outs.out = self.in0.data
     else:
-      outs.out = self.ins1.data
+      outs.out = self.in1.data
 
 # FIXME parametrize
 class Adder32(Component):
