@@ -1,8 +1,6 @@
-__all__ = ['arch', 'asm', 'control', 'alu']
+__all__ = ['asm', 'control', 'alu', 'MIPSArchitecture']
 
-import arch
-from components.component import Component
+from architecture import new_architecture
 
-for k, v in arch.__dict__.iteritems():
-  if isinstance(v, Component):
-    v.name = k
+MIPSArchitecture = new_architecture('MIPS', 'mips.arch')
+

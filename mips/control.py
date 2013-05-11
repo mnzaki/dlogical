@@ -1,5 +1,4 @@
 from components.component import *
-import arch
 from alu import ALU
 
 # This is the main control unit implemented as per the diagram
