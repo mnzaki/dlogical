@@ -11,20 +11,16 @@ class LayoutManager(object):
 class ColumnLayoutManager(LayoutManager):
   class Layout(Layout): pass
 
-  def __init__(self, arch, root = None):
+  def __init__(self, arch):
     super(ColumnLayoutManager, self).__init__(arch)
 
-    if root is None:
-      for k, v in arch.__dict__.iteritems():
-        if isinstance(v, Component):
-          root = v
-          break
-
     column = 0
-    components = deque([root])
+    components = deque([arch.root])
     while components:
       elem = components.popleft()
-      elem.layout = self.Layout(column = column)
+      # FIXME adjust column width depending on widest component
+      # FIXME distribute components along the y axis
+      elem.layout = self.Layout(column = column, x = column * 200, y = 100)
       if not isinstance(elem, Component): continue
       for port in elem.output_ports:
         for conn in port.connections:
