@@ -78,20 +78,22 @@ class Component(object):
   class InvalidPortConnection(Exception): pass
 
   def __init__(self, **kwargs):
-    inputs = self.inputs.copy()
-    for port_name in kwargs:
-      try: inputs.pop(port_name)
-      except KeyError: raise self.NoSuchInputPort(port_name)
-      setattr(self, port_name, kwargs[port_name])
+    self.inputs = self.inputs.copy()
+    for port_name, port_conn in kwargs.iteritems():
+      if port_name not in self.inputs: raise self.NoSuchInputPort(port_name)
+      setattr(self, port_name, port_conn)
+      self.inputs[port_name] = getattr(self, port_name)
 
-    for port_name in inputs:
-      setattr(self, port_name, 0)
+    for port_name, port_conn in self.inputs.iteritems():
+      if not isinstance(port_conn, PortConnection):
+        setattr(self, port_name, 0)
+        self.inputs[port_name] = getattr(self, port_name)
 
-    self.output_ports = []
-    for port_name in self.outputs:
-      port = Port(self.outputs[port_name])
+    self.outputs = self.outputs.copy()
+    for port_name, port in self.outputs.iteritems():
+      port = Port(port)
       setattr(self, port_name, port)
-      self.output_ports.append(port)
+      self.outputs[port_name] = port
 
   def __setattr__(self, name, value):
     if name in self.inputs:
@@ -100,6 +102,7 @@ class Component(object):
         value = Port(self.inputs[name], value)[:]
       if not isinstance(value, PortConnection):
         raise self.InvalidPortConnection(value)
+      self.inputs[name] = value
       value.connect(self, name)
 
     if name in self.outputs and hasattr(self, name):

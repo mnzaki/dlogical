@@ -22,7 +22,7 @@ class ColumnLayoutManager(LayoutManager):
       # FIXME distribute components along the y axis
       elem.layout = self.Layout(column = column, x = column * 200, y = 100)
       if not isinstance(elem, Component): continue
-      for port in elem.output_ports:
+      for port in elem.outputs.values():
         for conn in port.connections:
           if not hasattr(conn.component, 'layout'):
             components.append(conn.component)

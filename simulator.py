@@ -38,7 +38,7 @@ class Simulator:
         heappush(self.deltas, delta)
 
   def trigger_root(self, arch):
-    self.inject(Delta(0, arch.root.output_ports))
+    self.inject(Delta(0, arch.root.outputs.values()))
 
   def step(self):
     # create a mapping of affected components to messages of affected inputs
