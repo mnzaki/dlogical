@@ -23,7 +23,8 @@ class Mem(ParametrizedComponent):
     Component.__init__(self, **kwargs)
 
   def simulate(self, ins, outs):
+    addr = (self.addr.data * 8) / self.parameters['width']
     if self.write_en.data == 1:
-      self.mem[self.addr.data] = self.write.data
+      self.mem[addr] = self.write.data
     if self.read_en.data == 1:
-      outs.read = self.mem[self.addr.data]
+      outs.read = self.mem[addr]
