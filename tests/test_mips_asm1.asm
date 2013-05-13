@@ -1,4 +1,4 @@
-addi(t1, zero, 9)
+addi(t1, zero, 42)
 sll(t1, t1, 2)
 label('L1')
 lw(t2, t0, 0)
