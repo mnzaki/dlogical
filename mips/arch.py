@@ -3,9 +3,12 @@ from mips.alu import ALU
 from components.misc import *
 from components.registers import *
 from components.mem import Mem
+from components.oscillator import *
+
+clk = Oscillator.with_parameters(freq = 10000)()
 
 # It starts with a counter :')
-pc = DRegister32()
+pc = DRegisterSync32(clk = clk.clk[:])
 
 imem = Mem.with_parameters(width = 32, size = 1024)(
         addr = pc.d[:],
@@ -17,7 +20,7 @@ alucontrol = ALUControlUnit(aluop = control.aluop[:],
                             funct = imem.read[5:0],
                             opcode = imem.read[31:26])
 
-write_reg_mux = Mux(in0 = imem.read[20:16], in1 = imem.read[15:11], s = control.regdst[:])
+write_reg_mux = Mux32(in0 = imem.read[20:16], in1 = imem.read[15:11], s = control.regdst[:])
 
 regs = RegisterFile.with_parameters(num_regs = 32, width = 32)(
         read_reg1 = imem.read[25:21],
@@ -26,7 +29,7 @@ regs = RegisterFile.with_parameters(num_regs = 32, width = 32)(
 
 inst_sign_ext = SignExt(inp = imem.read[15:0])
 
-alusrc_mux = Mux(in0 = regs.read2[:], in1 = inst_sign_ext.out[:], s = control.alusrc[:])
+alusrc_mux = Mux32(in0 = regs.read2[:], in1 = inst_sign_ext.out[:], s = control.alusrc[:])
 
 alu = ALU(control = alucontrol.alucontrol[:], in0 = regs.read1[:], in1 = alusrc_mux.out[:])
 
@@ -36,7 +39,7 @@ dmem = Mem.with_parameters(width = 32, size = 8192)(
         write_en = control.memwrite[:],
         read_en = control.memread[:])
 
-regs_write_data_mux = Mux(in0 = alu.out[:], in1 = dmem.read[:], s = control.memtoreg[:])
+regs_write_data_mux = Mux32(in0 = alu.out[:], in1 = dmem.read[:], s = control.memtoreg[:])
 
 regs.write = regs_write_data_mux.out[:]
 
@@ -46,10 +49,10 @@ pc_add4 = Adder32(in0 = pc.d[:], in1 = 4)
 address_sll2 = SLL2(inp = inst_sign_ext.out[:])
 branch_adder = Adder32(in0 = pc_add4.out[:], in1 = address_sll2.out[:])
 branch_and_gate = AndGate(in0 = control.branch[:], in1 = alu.zero[:])
-branch_mux = Mux(in0 = pc_add4.out[:], in1 = branch_adder.out[:], s = branch_and_gate.out[:])
+branch_mux = Mux32(in0 = pc_add4.out[:], in1 = branch_adder.out[:], s = branch_and_gate.out[:])
 
 jmp_sll2 = SLL2(inp = imem.read[25:0])
-pc_update_mux = Mux(in0 = branch_mux.out[:],
+pc_update_mux = Mux32(in0 = branch_mux.out[:],
                     in1 = Wire(jmp_sll2.out[:], pc_add4.out[31:28]),
                     s   = control.jump[:])
 

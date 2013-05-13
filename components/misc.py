@@ -10,18 +10,21 @@ class AndGate(Component):
     if len(ins) > 0:
       outs.out = self.in0.data & self.in1.data
 
-class Mux(Component):
+class Mux(ParametrizedComponent):
   delay = 50
 
-  inputs = {'in0': 1, 'in1': 1, 's': 1}
-  outputs = {'out': 1}
+  parameters = {'width': 32}
+  inputs = {'in0': 'width', 'in1': 'width', 's': 1}
+  outputs = {'out': 'width'}
 
-  # FIXME check changes
+  # FIXME check changes?
   def simulate(self, ins, outs):
     if self.s.data == 0:
       outs.out = self.in0.data
     else:
       outs.out = self.in1.data
+
+Mux32 = Mux.with_parameters(width = 32)
 
 # FIXME parametrize
 class Adder32(Component):

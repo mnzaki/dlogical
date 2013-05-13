@@ -4,7 +4,7 @@ import math
 
 class DRegister(ParametrizedComponent):
   delay = 100
-  parameters  = {'width': 8}
+  parameters = {'width': 8}
   inputs = {'q': 'width'}
   outputs = {'d': 'width'}
 
@@ -13,6 +13,17 @@ class DRegister(ParametrizedComponent):
       outputs.d = inputs.q
 
 DRegister32 = DRegister.with_parameters(width = 32)
+
+# Positive edge triggered D register
+class DRegisterSync(DRegister):
+  inputs = {'q': 'width',
+            'clk': 1}
+
+  def simulate(self, ins, outs):
+    if 'clk' in ins and ins.clk == 1:
+      outs.d = self.q.data
+
+DRegisterSync32 = DRegisterSync.with_parameters(width = 32)
 
 # Note: Write before Read
 class RegisterFile(ParametrizedComponent):
@@ -35,7 +46,7 @@ class RegisterFile(ParametrizedComponent):
     self.registers = [0] * self.parameters['num_regs']
 
   def simulate(self, inputs, outputs):
-    if ('write' in inputs or 'write_reg' in inputs) and inputs.write_en == 1:
+    if ('write' in inputs or 'write_reg' in inputs) and self.write_en.data == 1:
       self.registers[self.write_reg.data] = self.write.data
       if self.read_reg1.data == self.write_reg.data:
         outputs.read1 = self.write.data
