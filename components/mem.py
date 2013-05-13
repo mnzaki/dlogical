@@ -3,6 +3,7 @@ import math
 
 class Mem(ParametrizedComponent):
   delay = 400
+  shape = Rectangle(200, 300)
 
   parameters = {'width': 32, 'size': 1024 }
 

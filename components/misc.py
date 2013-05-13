@@ -1,4 +1,5 @@
 from component import *
+from visual.shapes import *
 
 class AndGate(Component):
   delay = 10
@@ -12,6 +13,7 @@ class AndGate(Component):
 
 class Mux(ParametrizedComponent):
   delay = 50
+  shape = Trapezium(150, 150)
 
   parameters = {'width': 32}
   inputs = {'in0': 'width', 'in1': 'width', 's': 1}
@@ -29,6 +31,7 @@ Mux32 = Mux.with_parameters(width = 32)
 # FIXME parametrize
 class Adder32(Component):
   delay = 100
+  shape = Trapezium(200, 250)
 
   inputs = {'in0': 32, 'in1': 32}
   outputs = {'out': 32}
@@ -41,6 +44,7 @@ class Adder32(Component):
 # FIXME parametrize
 class SLL2(Component):
   delay = 50
+  shape = Circle(75)
 
   inputs = {'inp': 32}
   outputs = {'out': 32}
@@ -52,6 +56,7 @@ class SLL2(Component):
 
 class SignExt(Component):
   delay = 50
+  shape = Circle(75)
 
   inputs = {'inp': 16}
   outputs = {'out': 32}

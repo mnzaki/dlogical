@@ -1,4 +1,5 @@
 from simulator import Delta
+from visual.shapes import *
 
 class PortConnection(object):
   def __init__(self, port, start, end):
@@ -67,6 +68,9 @@ class Component(object):
 
   # delay in ms
   delay = 42
+
+  # shape to represet this component
+  shape = Rectangle(150, 150)
 
   class NoSuchPort(Exception): pass
   class NoSuchInputPort(NoSuchPort): pass

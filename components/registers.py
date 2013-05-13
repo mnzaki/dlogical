@@ -4,6 +4,8 @@ import math
 
 class DRegister(ParametrizedComponent):
   delay = 100
+  shape = Rectangle(150, 200)
+
   parameters = {'width': 8}
   inputs = {'q': 'width'}
   outputs = {'d': 'width'}
@@ -28,6 +30,7 @@ DRegisterSync32 = DRegisterSync.with_parameters(width = 32)
 # Note: Write before Read
 class RegisterFile(ParametrizedComponent):
   delay = 500
+  shape = Rectangle(200, 300)
 
   parameters = {'num_regs': 16, 'width': 32}
 
