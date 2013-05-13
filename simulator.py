@@ -18,10 +18,11 @@ class Delta:
 
   def __repr__(self):
     affected = []
+    s = "Delta(%i, " % self.time
     for port in self.ports:
-      affected.extend(port.connections)
-
-    return "Delta(%i, %i => %s)" % (self.time, self.ports[0].data, affected)
+      s += "%i => %s, " % (port.data, port.connections)
+    s += ")"
+    return s
 
 class Simulator:
   def __init__(self, deltas = [], new_deltas_cb = None):
