@@ -19,8 +19,8 @@ class Delta:
   def __repr__(self):
     affected = []
     s = "Delta(%i, " % self.time
-    for port in self.ports:
-      s += "%i => %s, " % (port.data, port.connections)
+    for port, val in self.ports:
+      s += "%i => %s, " % (val, port.connections)
     s += ")"
     return s
 
@@ -37,8 +37,14 @@ class Simulator:
       for delta in inp:
         heappush(self.deltas, delta)
 
+  def trigger_component(self, comp):
+    delta_ports = []
+    for port_conn in comp.inputs.values():
+      delta_ports.append((port_conn.port, port_conn.data))
+    self.inject(Delta(0, delta_ports))
+
   def trigger_root(self, arch):
-    self.inject(Delta(0, arch.root.outputs.values()))
+    self.trigger_component(arch.root)
 
   def step(self):
     # create a mapping of affected components to messages of affected inputs
@@ -47,7 +53,10 @@ class Simulator:
     for delta in self.deltas:
       delta.time -= delta_time
       if delta.time == 0:
-        for port in delta.ports:
+        for port, val in delta.ports:
+          if not hasattr(port, 'simulated_at_least_once') or port.data != val:
+            port.simulated_at_least_once = True
+            port.data = val
           for conn in port.connections:
             if conn.component not in affected:
               affected[conn.component] = Message()
@@ -66,8 +75,8 @@ class Simulator:
       delta_ports = []
       for port_name, val in outputs_msg.iteritems():
         # FIXME throw exception if port could not be found
-        delta_ports.append(getattr(component, port_name))
-        getattr(component, port_name).data = val
+        port = getattr(component, port_name)
+        delta_ports.append((port, val))
 
       # push this delta if it is non-empty
       if len(delta_ports) != 0:

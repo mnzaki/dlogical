@@ -19,18 +19,29 @@ class TestSimulator(unittest.TestCase):
     adder = Adder32(in0 = reg.d[:], in1 = 1)
     reg.q = adder.out[:]
 
-    self.sim.inject(Delta(100, [reg.d]))
+    self.sim.trigger_component(reg)
 
     self.sim.step()
     self.assertEqual(len(self.sim.deltas), 1)
-    self.assertEqual(self.sim.deltas[0].ports[0], adder.out)
+    self.assertEqual(self.sim.deltas[0].ports[0], (reg.d, 0))
+
+    self.sim.step()
+    self.assertEqual(len(self.sim.deltas), 1)
+    self.assertEqual(self.sim.deltas[0].ports[0], (adder.out, 1))
+    self.assertEqual(adder.out.data, 0)
+    self.assertEqual(reg.q.data, 0)
+    self.assertEqual(reg.d.data, 0)
+
+    self.sim.step()
+    self.assertEqual(len(self.sim.deltas), 1)
+    self.assertEqual(self.sim.deltas[0].ports[0], (reg.d, 1))
     self.assertEqual(adder.out.data, 1)
     self.assertEqual(reg.q.data, 1)
     self.assertEqual(reg.d.data, 0)
 
     self.sim.step()
     self.assertEqual(len(self.sim.deltas), 1)
-    self.assertEqual(self.sim.deltas[0].ports[0], reg.d)
+    self.assertEqual(self.sim.deltas[0].ports[0], (adder.out, 2))
     self.assertEqual(adder.out.data, 1)
     self.assertEqual(reg.q.data, 1)
     self.assertEqual(reg.d.data, 1)
@@ -48,7 +59,10 @@ class TestSimulator(unittest.TestCase):
     bigreg = DReg8(q = Wire(reg1.d[:], reg2.d[:]))
     self.assertEqual(bigreg.q.width, 8)
 
-    self.sim.inject(Delta(100, [reg1.d, reg2.q.port]))
+    self.sim.trigger_component(reg1)
+    self.sim.trigger_component(reg2)
+    self.sim.step()
+    self.sim.step()
 
     # FIXME change this after fixing the lost cycle in Wire()s
     self.sim.step()
