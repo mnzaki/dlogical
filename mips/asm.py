@@ -13,7 +13,7 @@ RS_SLICE     = slice(6, 11)
 RT_SLICE     = slice(11, 16)
 RD_SLICE     = slice(16, 21)
 SHAMT_SLICE  = slice(21, 26)
-FUNCT_SLICE  = slice(26, 31)
+FUNCT_SLICE  = slice(26, 32)
 IMM_SLICE    = slice(16, 32)
 
 class ASM(object):
@@ -46,7 +46,8 @@ class RFormat(Instruction):
     'sub':  0b100010,
     'and_': 0b100100,
     'or_':  0b100101,
-    'slt':  0b101010
+    'slt':  0b101010,
+    'nor':  0b100111
   }
 
   @classmethod
@@ -70,7 +71,8 @@ class RFormat(Instruction):
 
 class Shifts(RFormat):
   instructions = {
-    'sll': 0b000000
+    'sll': 0b000000,
+    'srl': 0b000010
   }
 
   def __init__(self, rd, rt, shamt):
@@ -81,7 +83,9 @@ class IFormat(Instruction):
   instructions = {
     'lw':   0b100011,
     'sw':   0b101011,
-    'addi': 0b001000
+    'addi': 0b001000,
+    'ori':  0b001101,
+    'andi': 0b001100
   }
 
   def __init__(self, rt, rs, imm):
@@ -92,7 +96,10 @@ class IFormat(Instruction):
       self.imm = imm()
     else:
       self.imm = imm
-    self.imm = BitArray(length = 16, int = self.imm)
+    if self.imm > 0:
+      self.imm = BitArray(length = 16, uint = self.imm)
+    else:
+      self.imm = BitArray(length = 16, int = self.imm)
   def _gen_data(self, b):
     b[RS_SLICE] = self.rs
     b[RT_SLICE] = self.rt
