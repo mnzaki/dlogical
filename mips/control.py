@@ -8,8 +8,9 @@ from alu import ALU
 class ControlUnit(Component):
   delay = 200
 
-  inputs  = {'opcode':   6}
-
+  inputs  = {'opcode':   6,
+             'funct':    6
+            }
   outputs = {'regdst':   1,
              'jump':     1,
              'branch':   1,
@@ -18,7 +19,9 @@ class ControlUnit(Component):
              'aluop':    2,
              'memwrite': 1,
              'alusrc':   1,
-             'regwrite': 1
+             'regwrite': 1,
+             'beq_ne':   1,
+             'regtopc':  1
             }
 
   def simulate(self, ins, outs):
@@ -26,21 +29,26 @@ class ControlUnit(Component):
     is_ifmt = self.opcode.data >  0b000111
     is_lw   = self.opcode.data == 0b100011
     is_sw   = self.opcode.data == 0b101011
-    is_brn  = (self.opcode.data & 0b111100) == 0b000100
-    is_jmp  = (self.opcode.data & 0b111110) == 0b000010
+    is_beq  = self.opcode.data == 0b000100
+    is_bne  = self.opcode.data == 0b000101
+    is_j    = self.opcode.data == 0b000010
+    is_jal  = self.opcode.data == 0b000011
+    is_jr   = self.funct.data  == 0b001000
 
     outs.regdst = is_rfmt
-    outs.jump = is_jmp
-    outs.branch = is_brn
+    outs.jump = is_j
+    outs.branch = is_beq | is_bne
     outs.memread = is_lw
     outs.memtoreg = is_lw
     outs.memwrite = is_sw
     outs.alusrc = is_ifmt
     outs.regwrite = is_rfmt | is_ifmt
+    outs.beq_ne = is_beq
+    outs.regtopc = is_jr
 
     if is_lw or is_sw:
       outs.aluop = 0b00
-    elif is_brn or is_jmp:
+    elif is_beq or is_bne or is_j:
       outs.aluop = 0b01
     elif is_rfmt:
       outs.aluop = 0b10
@@ -65,7 +73,7 @@ class ALUControlUnit(Component):
     elif self.aluop.data == 0b01:
       outs.alucontrol = ALU.SUB_OP
     elif self.aluop.data == 0b10:
-      if self.funct.data == 0b100000:
+      if self.funct.data == 0b100000 or self.funct.data == 0b001000:
         outs.alucontrol = ALU.ADD_OP
       elif self.funct.data == 0b100010:
         outs.alucontrol = ALU.SUB_OP
@@ -75,6 +83,8 @@ class ALUControlUnit(Component):
         outs.alucontrol = ALU.OR_OP
       elif self.funct.data == 0b101010:
         outs.alucontrol = ALU.SLT_OP
+      elif self.funct.data == 0b100111:
+        outs.alucontrol = ALU.NOR_OP
     elif self.aluop.data == 0b11:
       if self.opcode.data == 0b001000:
         outs.alucontrol = ALU.ADD_OP
@@ -84,3 +94,10 @@ class ALUControlUnit(Component):
         outs.alucontrol = ALU.AND_OP
       elif self.opcode.data == 0b001101:
         outs.alucontrol = ALU.OR_OP
+
+class BranchControl(Component):
+  inputs  = {'branch': 1, 'zero': 1, 'eq': 1}
+  outputs = {'out': 1}
+
+  def simulate(self, ins, outs):
+    outs.out = self.branch.data & int(self.zero.data == self.eq.data)

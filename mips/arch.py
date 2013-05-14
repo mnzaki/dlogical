@@ -32,7 +32,9 @@ inst_sign_ext = SignExt(inp = imem.read[15:0])
 
 alusrc_mux = Mux32(in0 = regs.read2[:], in1 = inst_sign_ext.out[:], s = control.alusrc[:])
 
-alu = ALU(control = alucontrol.alucontrol[:], in0 = regs.read1[:], in1 = alusrc_mux.out[:])
+alu = ALU(control = alucontrol.alucontrol[:],
+          in0 = regs.read1[:], in1 = alusrc_mux.out[:],
+          shamt = imem.read[10:6])
 
 dmem = Mem.with_parameters(width = 32, size = 8192)(
         addr = alu.out[:],
@@ -50,6 +52,7 @@ pc_add4 = Adder32(in0 = pc.d[:], in1 = 4)
 address_sll2 = SLL2(inp = inst_sign_ext.out[:])
 branch_adder = Adder32(in0 = pc_add4.out[:], in1 = address_sll2.out[:])
 branch_and_gate = AndGate(in0 = control.branch[:], in1 = alu.zero[:])
+branch_control = BranchControl(branch = control.branch[:], zero = alu.zero[:], eq = control.beq_ne[:])
 branch_mux = Mux32(in0 = pc_add4.out[:], in1 = branch_adder.out[:], s = branch_and_gate.out[:])
 
 jmp_sll2 = SLL2(inp = imem.read[25:0])
