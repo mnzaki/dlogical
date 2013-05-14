@@ -92,3 +92,5 @@ class Simulator:
 
     if self.new_deltas_cb:
       self.new_deltas_cb(self, affected, new_deltas)
+
+    return delta_time

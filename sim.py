@@ -18,14 +18,21 @@ for i, a in enumerate(asm):
   mips.imem.mem[i] = a
 
 col_width = 30 
+def print_deltas(deltas):
+  deltas.sort()
+  for d in deltas:
+    print d
+
 def change_cb(sim, affected, deltas):
-  #print sim.deltas
+  #print_deltas(deltas)
+  print
   for comp, ports in affected.iteritems():
     s = "%s" % comp
     print comp, " " * (col_width - len(s)),
     for port, val in ports.iteritems():
       print "%s = %i," % (port, val),
     print
+  print
 
 sim = Simulator()
 sim.trigger_root(mips)
@@ -39,6 +46,7 @@ print "          'i[nspect] <memaddr>' to inspect memory at address <memaddr>"
 print "          'r[egister] <regnum>' to inspect value of register number <regnum>"
 print "          'p[ort] comp.port|comp' to inspect value of a port"
 print "          'a[dvance] <expr>' advance the simulation until <expr> is true"
+print "          's[kip] <time>' skip at least <time> time units"
 print "Press Enter to advance the simulation"
 print
 
@@ -58,10 +66,7 @@ while True:
       if cmd == 'q' or cmd == "quit":
         break
       elif cmd == 'd' or cmd == 'deltas':
-        deltas = list(sim.deltas)
-        deltas.sort()
-        for d in deltas:
-          print d
+        print_deltas(list(sim.deltas))
       elif cmd == 'i' or cmd == 'inspect':
         addr = eval(inp)
         print mips.imem.mem[addr / 4]
@@ -87,6 +92,12 @@ while True:
                              % (MAX_ADVANCE_STEPS, inp))
           if eval(inp, mips.__dict__):
             break
+      elif cmd == 's' or cmd == 'skip':
+        to_skip = int(inp)
+        while to_skip > 0:
+          to_skip -= sim.step()
+        print
+        print "Skipped ahead %i" % (int(inp) - to_skip)
       else:
         raise Exception("Invalid command")
     except Exception as e:
