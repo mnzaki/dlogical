@@ -54,9 +54,7 @@ class Simulator:
       delta.time -= delta_time
       if delta.time == 0:
         for port, val in delta.ports:
-          if not hasattr(port, 'simulated_at_least_once') or port.data != val:
-            port.simulated_at_least_once = True
-            port.data = val
+          port.data = val
           for conn in port.connections:
             if conn.component not in affected:
               affected[conn.component] = Message()
@@ -76,7 +74,9 @@ class Simulator:
       for port_name, val in outputs_msg.iteritems():
         # FIXME throw exception if port could not be found
         port = getattr(component, port_name)
-        delta_ports.append((port, val))
+        if not hasattr(port, 'simulated_at_least_once') or port.data != val:
+          port.simulated_at_least_once = True
+          delta_ports.append((port, val))
 
       # push this delta if it is non-empty
       if len(delta_ports) != 0:
