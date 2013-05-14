@@ -14,6 +14,7 @@ class TestSimulator(unittest.TestCase):
     self.sim.new_deltas_cb = new_deltas_cb
 
   def test_simple_counter(self):
+    self.sim.deltas = []
     reg = DRegister32()
     adder = Adder32(in0 = reg.d[:], in1 = 1)
     reg.q = adder.out[:]
@@ -35,6 +36,7 @@ class TestSimulator(unittest.TestCase):
     self.assertEqual(reg.d.data, 1)
 
   def test_wires(self):
+    self.sim.deltas = []
     DReg4 = DRegister.with_parameters(width = 4)
     DReg8 = DRegister.with_parameters(width = 8)
 

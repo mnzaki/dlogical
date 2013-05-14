@@ -128,28 +128,31 @@ class Component(object):
 
 # FIXME this feels like such a hack
 # Usage is supposed to be like a normal PortConnection for Component inputs
-class Wire(PortConnection):
+class Wire(PortConnection, Component):
   delay = 0
 
   def __init__(self, *args):
     self.width = 0
+    self.inputs = {}
     for pos, arg in enumerate(args):
       # FIXME support a mix of connections and constant values
       if not isinstance(arg, PortConnection):
         raise Exception("A wire must consist of PortConnections!")
       self.width += arg.width
-      arg.connect(self, "conn%i" % pos)
+      port_name = "conn%i" % pos
+      arg.connect(self, port_name)
+      self.inputs[port_name] = arg
 
-    self.inputs = list(args)
+    self.ordered_inputs = args
     self.port = Port(self.width)
     self.update()
 
   def update(self):
     width = self.width
     self.data = 0
-    for conn in self.inputs:
-      width -= conn.width
-      self.data |= conn.data << width
+    for port_conn in self.ordered_inputs:
+      width -= port_conn.width
+      self.data |= port_conn.data << width
     return self.data
 
   def simulate(self, ins, outs):
