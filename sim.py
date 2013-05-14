@@ -3,7 +3,11 @@
 from mips import MIPSArchitecture
 from mips.asm import Assembler
 from simulator import *
+from components.component import *
 import sys
+import readline
+
+MAX_ADVANCE_STEPS = 100
 
 assembler = Assembler()
 asm = list(assembler.assemble(sys.argv[1]))
@@ -23,14 +27,18 @@ def change_cb(sim, affected, deltas):
       print "%s = %i," % (port, val),
     print
 
-
 sim = Simulator()
 sim.trigger_root(mips)
 sim.new_deltas_cb = change_cb
 
 print "Beginning Simulation"
 print "Initial Delta Set: ", sim.deltas
-print "Commands: 'd[eltas]' for the current delta set, 'q[uit]' to quit"
+print "Commands: 'q[uit]' to quit'"
+print "          'd[eltas]' for the current delta set"
+print "          'i[nspect] <memaddr>' to inspect memory at address <memaddr>"
+print "          'r[egister] <regnum>' to inspect value of register number <regnum>"
+print "          'p[ort] comp.port|comp' to inspect value of a port"
+print "          'a[dvance] <expr>' advance the simulation until <expr> is true"
 print "Press Enter to advance the simulation"
 print
 
@@ -40,13 +48,49 @@ while True:
   except EOFError, KeyboardInterrupt:
     break
   if inp:
-    if inp[0] == 'q':
-      break
-    elif inp[0] == 'd':
-      deltas = list(sim.deltas)
-      deltas.sort()
-      for d in deltas:
-        print d
+    try:
+      inp = inp.split(" ", 1)
+      cmd = inp[0]
+      if len(inp) > 1:
+        inp = inp[1]
+      else:
+        inp = None
+      if cmd == 'q' or cmd == "quit":
+        break
+      elif cmd == 'd' or cmd == 'deltas':
+        deltas = list(sim.deltas)
+        deltas.sort()
+        for d in deltas:
+          print d
+      elif cmd == 'i' or cmd == 'inspect':
+        addr = eval(inp)
+        print mips.imem.mem[addr / 4]
+      elif cmd == 'r' or cmd == 'register':
+        reg = int(inp)
+        print mips.regs.registers[reg]
+      elif cmd == 'p' or cmd == 'port':
+        port = "mips." + inp
+        obj = eval(port)
+        if isinstance(obj, Port) or isinstance(obj, PortConnection):
+          obj = obj.data
+        print obj
+      elif cmd == 'a' or cmd == 'advance':
+        if not inp: raise Exception("You must provide an expression!")
+        max_steps = MAX_ADVANCE_STEPS
+        while True:
+          max_steps -= 1
+          sim.step()
+          print
+          if max_steps < 0:
+             raise Exception("Maximum number of steps (%i) taken"\
+                             " and expression '%s' is still not true"\
+                             % (MAX_ADVANCE_STEPS, inp))
+          if eval(inp, mips.__dict__):
+            break
+      else:
+        raise Exception("Invalid command")
+    except Exception as e:
+      print e
   else:
     sim.step()
   print
