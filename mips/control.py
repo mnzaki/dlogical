@@ -73,7 +73,11 @@ class ALUControlUnit(Component):
     elif self.aluop.data == 0b01:
       outs.alucontrol = ALU.SUB_OP
     elif self.aluop.data == 0b10:
-      if self.funct.data == 0b100000 or self.funct.data == 0b001000:
+      if self.funct.data == 0b000000:
+        outs.alucontrol = ALU.SLL_OP
+      elif self.funct.data == 0b000010:
+        outs.alucontrol = ALU.SRL_OP
+      elif self.funct.data == 0b100000 or self.funct.data == 0b001000:
         outs.alucontrol = ALU.ADD_OP
       elif self.funct.data == 0b100010:
         outs.alucontrol = ALU.SUB_OP
