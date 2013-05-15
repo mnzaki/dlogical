@@ -52,14 +52,13 @@ pc_add4 = Adder32(in0 = pc.d[:], in1 = 4)
 
 address_sll2 = SLL2(inp = inst_sign_ext.out[:])
 branch_adder = Adder32(in0 = pc_add4.out[:], in1 = address_sll2.out[:])
-branch_and_gate = AndGate(in0 = control.branch[:], in1 = alu.zero[:])
 branch_control = BranchControl(branch = control.branch[:], zero = alu.zero[:], eq = control.beq_ne[:])
-branch_mux = Mux32(in0 = pc_add4.out[:], in1 = branch_adder.out[:], s = branch_and_gate.out[:])
+branch_mux = Mux32(in0 = pc_add4.out[:], in1 = branch_adder.out[:], s = branch_control.out[:])
 
 jmp_sll2 = SLL2(inp = imem.read[25:0])
 pc_update_mux = Mux32(in0 = branch_mux.out[:],
-                    in1 = Wire(jmp_sll2.out[:], pc_add4.out[31:28]),
-                    s   = control.jump[:])
+                      in1 = Wire(pc_add4.out[31:28], jmp_sll2.out[:]),
+                      s   = control.jump[:])
 
 # And it ends with a counter update
 pc.q = pc_update_mux.out[:]
