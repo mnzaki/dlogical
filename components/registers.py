@@ -59,3 +59,14 @@ class RegisterFile(ParametrizedComponent):
       outputs.read1 = self.registers[inputs.read_reg1]
     if 'read_reg2' in inputs:
       outputs.read2 = self.registers[inputs.read_reg2]
+
+# Synchronous write positive edge triggered register file
+class RegisterFileSync(RegisterFile):
+  inputs = RegisterFile.inputs.copy()
+  inputs['clk'] = 1
+
+  def simulate(self, inputs, outputs):
+    if 'clk' in inputs and inputs.clk == 1:
+      self.registers[self.write_reg.data] = self.write.data
+    outputs.read1 = self.registers[self.read_reg1.data]
+    outputs.read2 = self.registers[self.read_reg2.data]

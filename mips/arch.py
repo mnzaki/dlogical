@@ -22,11 +22,12 @@ alucontrol = ALUControlUnit(aluop = control.aluop[:],
 
 write_reg_mux = Mux32(in0 = imem.read[20:16], in1 = imem.read[15:11], s = control.regdst[:])
 
-regs = RegisterFile.with_parameters(num_regs = 32, width = 32)(
+regs = RegisterFileSync.with_parameters(num_regs = 32, width = 32)(
         read_reg1 = imem.read[25:21],
         read_reg2 = imem.read[20:16],
         write_reg = write_reg_mux.out[:],
-        write_en  = control.regwrite[:])
+        write_en  = control.regwrite[:],
+        clk       = clk.clk[:])
 
 inst_sign_ext = SignExt(inp = imem.read[15:0])
 
