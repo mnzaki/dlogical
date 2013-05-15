@@ -6,6 +6,7 @@ from simulator import *
 from components.component import *
 import sys
 import readline
+from bitstring import BitArray
 
 MAX_ADVANCE_STEPS = 100
 
@@ -72,7 +73,8 @@ while True:
         print mips.imem.mem[addr / 4]
       elif cmd == 'r' or cmd == 'register':
         reg = int(inp)
-        print mips.regs.registers[reg]
+        b = BitArray(length = 32, uint = mips.regs.registers[reg])
+        print b.int
       elif cmd == 'p' or cmd == 'port':
         port = "mips." + inp
         obj = eval(port)
