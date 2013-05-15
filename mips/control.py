@@ -31,24 +31,25 @@ class ControlUnit(Component):
     is_sw   = self.opcode.data == 0b101011
     is_beq  = self.opcode.data == 0b000100
     is_bne  = self.opcode.data == 0b000101
+    is_brn  = is_beq | is_bne
     is_j    = self.opcode.data == 0b000010
     is_jal  = self.opcode.data == 0b000011
     is_jr   = self.funct.data  == 0b001000
 
     outs.regdst = is_rfmt
     outs.jump = is_j
-    outs.branch = is_beq | is_bne
+    outs.branch = is_brn
     outs.memread = is_lw
     outs.memtoreg = is_lw
     outs.memwrite = is_sw
     outs.alusrc = is_ifmt
-    outs.regwrite = is_rfmt | is_ifmt
+    outs.regwrite = (is_rfmt & (not is_jr)) | (is_ifmt & (not is_brn))
     outs.beq_ne = is_beq
     outs.regtopc = is_jr
 
     if is_lw or is_sw:
       outs.aluop = 0b00
-    elif is_beq or is_bne or is_j:
+    elif is_brn or is_j:
       outs.aluop = 0b01
     elif is_rfmt:
       outs.aluop = 0b10
