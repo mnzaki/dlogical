@@ -119,7 +119,10 @@ class JFormat(Instruction):
 
   def __init__(self, address):
     super(JFormat, self).__init__()
-    self.address = address
+    if isinstance(address, Label):
+      self.address = address.absolute()
+    else:
+      self.address = address
   def _gen_data(self, b):
     b[DATA_SLICE] = self.address
 

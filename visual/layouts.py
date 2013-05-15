@@ -16,15 +16,30 @@ class ColumnLayoutManager(LayoutManager):
 
     column = 0
     components = deque([arch.root])
+    next_components = deque()
     while components:
       elem = components.popleft()
-      # FIXME adjust column width depending on widest component
-      # FIXME distribute components along the y axis
-      elem.layout = self.Layout(column = column, x = column * 200, y = 100)
+      print elem
       if not isinstance(elem, Component): continue
+      elem.layout = self.layout(column)
       for port in elem.outputs.values():
         for conn in port.connections:
-          if not hasattr(conn.component, 'layout'):
-            components.append(conn.component)
-      column += 1
+          if conn.component is not arch.root and\
+             conn.component not in next_components:
+            if hasattr(conn.component, 'layout') and\
+               hasattr(conn.component.layout, 'relayout'):
+              conn.component.layout.relayout -= 1
+              print conn.component.layout
+              if conn.component.layout.relayout < 0:
+                next
+            next_components.append(conn.component)
+      if not components:
+        print "NEEEEEEEEEEEEXT"
+        print
+        components, next_components = next_components, components
+        column += 1
 
+  def layout(self, column):
+    # FIXME adjust column width depending on widest component
+    # FIXME distribute components along the y axis
+    return self.Layout(column = column, x = column * 200, y = 100)
