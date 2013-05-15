@@ -69,6 +69,11 @@ class RFormat(Instruction):
     b[SHAMT_SLICE] = self.shamt
     b[FUNCT_SLICE] = self.funct
 
+class jr(RFormat):
+  funct = 0b001000
+  def __init__(self, rs):
+    RFormat.__init__(self, 0, rs, 0)
+
 class Shifts(RFormat):
   instructions = {
     'sll': 0b000000,
@@ -133,6 +138,7 @@ class JFormat(Instruction):
 for fmt in [RFormat, Shifts, IFormat, FlippedIFormat, JFormat]:
   for k, v in fmt.instructions.iteritems():
     fmt.new(k, v)
+ASM.instruction_set['jr'] = jr
 
 class Label(object):
   def __init__(self, pos = None):

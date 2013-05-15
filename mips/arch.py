@@ -15,7 +15,8 @@ imem = Mem.with_parameters(width = 32, size = 1024)(
         write_en = 0,
         read_en = 1)
 
-control = ControlUnit(opcode = imem.read[31:26])
+control = ControlUnit(opcode = imem.read[31:26],
+                      funct  = imem.read[5:0])
 alucontrol = ALUControlUnit(aluop = control.aluop[:],
                             funct = imem.read[5:0],
                             opcode = imem.read[31:26])
@@ -63,5 +64,8 @@ pc_update_mux = Mux32(in0 = branch_mux.out[:],
                       in1 = Wire(pc_add4.out[31:28], jmp_sll2.out[:]),
                       s   = control.jump[:])
 
+reg_to_pc_mux = Mux32(in0 = pc_update_mux.out[:],
+                      in1 = regs.read1[:],
+                      s   = control.regtopc[:])
 # And it ends with a counter update
-pc.q = pc_update_mux.out[:]
+pc.q = reg_to_pc_mux.out[:]
