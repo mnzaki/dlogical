@@ -118,7 +118,8 @@ class FlippedIFormat(IFormat):
 
 class JFormat(Instruction):
   instructions = {
-    'j': 0b000010
+    'j':   0b000010,
+    'jal': 0b000011
   }
 
   def __init__(self, address):
@@ -170,6 +171,8 @@ class AssemblerEnvironment(dict):
         self['s%d' % (i - 16)] = i
     # $zero
     self['zero'] = 0
+    # $ra
+    self['ra'] = 31
 
     # Instructions
     for name, inst in ASM.instruction_set.iteritems():
