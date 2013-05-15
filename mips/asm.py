@@ -121,6 +121,8 @@ class JFormat(Instruction):
     super(JFormat, self).__init__()
     self.address = address
   def _gen_data(self, b):
+    if isinstance(self.address, Label):
+      self.address = self.address.absolute()
     b[DATA_SLICE] = self.address
 
 for fmt in [RFormat, Shifts, IFormat, FlippedIFormat, JFormat]:
