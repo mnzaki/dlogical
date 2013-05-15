@@ -166,19 +166,26 @@ class AssemblerEnvironment(dict):
   def __init__(self):
     dict.__init__(self, CLEAN_ENV)
 
+    #http://www.cs.purdue.edu/homes/hosking/502/spim/node10.html
+    self['zero'] = 0
+    self['at'] = 1
+    self['v0'] = 2
+    self['v1'] = 3
+    # registers $a0 - $a3 are 4 - 7
+    for i in xrange(4, 8):
+        self['a%d' % (i - 4)] = i
     # registers $t0 - $t7 are 8 - 15
     for i in xrange(8, 16):
         self['t%d' % (i - 8)] = i
-    # registers $t8 - $t9 are 24 - 25
-    for i in xrange(24, 26):
-        self['t%d' % (i - 16)] = i
     # registers $s0 - $s7 are 16 - 23
     for i in xrange(16, 24):
         self['s%d' % (i - 16)] = i
-    # $zero
-    self['zero'] = 0
-    # $ra
-    self['ra'] = 31
+    # registers $t8 - $t9 are 24 - 25
+    for i in xrange(24, 26):
+        self['t%d' % (i - 16)] = i
+    # other
+    for i, reg in enumerate(['k0', 'k1', 'gp', 'sp', 'fp', 'ra']):
+      self[reg] = i + 26
 
     # Instructions
     for name, inst in ASM.instruction_set.iteritems():
