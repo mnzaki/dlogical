@@ -1,3 +1,4 @@
+from bitstring import BitArray
 from component import *
 from visual.shapes import *
 
@@ -64,4 +65,5 @@ class SignExt(Component):
   def simulate(self, ins, outs):
     if len(ins) > 0:
       # FIXME normalize messages: auto convert ints to bitarrays
-      outs.out = self.inp.data
+      b = BitArray(length = 16, uint = self.inp.data)
+      outs.out = b.int
