@@ -92,25 +92,29 @@ class IFormat(Instruction):
     super(IFormat, self).__init__()
     self.rs = BitArray(length = 5, uint = rs)
     self.rt = BitArray(length = 5, uint = rt)
-    if callable(imm):
-      self.imm = imm()
-    else:
-      self.imm = imm
+    self.imm = imm
+  def _gen_data(self, b):
+    b[RS_SLICE] = self.rs
+    b[RT_SLICE] = self.rt
+
+    if isinstance(self.imm, Label):
+      self.imm = self.imm.relative(self)
     if self.imm > 0:
       self.imm = BitArray(length = 16, uint = self.imm)
     else:
       self.imm = BitArray(length = 16, int = self.imm)
-  def _gen_data(self, b):
-    b[RS_SLICE] = self.rs
-    b[RT_SLICE] = self.rt
+
     b[IMM_SLICE] = self.imm
 
 class FlippedIFormat(IFormat):
   instructions = {
     'beq':  0b000100,
+    'bne':  0b000101,
   }
   def __init__(self, rs, rt, imm):
     super(FlippedIFormat, self).__init__(rt, rs, imm)
+  def _gen_data(self, b):
+    super(FlippedIFormat, self)._gen_data(b)
 
 class JFormat(Instruction):
   instructions = {
@@ -131,19 +135,26 @@ for fmt in [RFormat, Shifts, IFormat, FlippedIFormat, JFormat]:
 
 class Label(object):
   def __init__(self, pos = None):
+    self.update(pos)
+  def update(self, pos = None):
     if pos is None:
       pos = len(ASM.program)
     self.pos = pos
-  def relative(self):
-    return self.pos - len(ASM.program)
+  def relative(self, inst):
+    return self.pos - ASM.program.index(inst) - 1
   def absolute(self):
     return self.pos
-  def __call__(self):
-    return self.relative()
 
 class AssemblerEnvironment(dict):
   def label(self, name):
-    self[name] = Label()
+    if name in self:
+      self[name].update()
+    else:
+      self[name] = Label()
+
+  def define_labels(self, *args):
+    for l in args:
+      self[l] = Label()
 
   def __init__(self):
     dict.__init__(self, CLEAN_ENV)
@@ -167,6 +178,7 @@ class AssemblerEnvironment(dict):
     # program keeping and special cases
     self['program'] = []
     self['label'] = self.label
+    self['define_labels'] = self.define_labels
 
 class Assembler(object):
   def assemble(self, fname):
