@@ -30,7 +30,7 @@ class ALU(Component):
     elif self.control.data == self.SUB_OP:
       outs.out = self.in0.data - self.in1.data
     elif self.control.data == self.SLT_OP:
-      outs.out = self.in0.data < self.in1.data #FIXME?
+      outs.out = int(self.in0.data < self.in1.data) #FIXME?
     elif self.control.data == self.NOR_OP:
       outs.out = ~(self.in0.data | self.in1.data)
 
