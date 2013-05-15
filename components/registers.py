@@ -66,7 +66,7 @@ class RegisterFileSync(RegisterFile):
   inputs['clk'] = 1
 
   def simulate(self, inputs, outputs):
-    if 'clk' in inputs and inputs.clk == 1:
+    if 'clk' in inputs and inputs.clk == 1 and self.write_en.data == 1:
       self.registers[self.write_reg.data] = self.write.data
     outputs.read1 = self.registers[self.read_reg1.data]
     outputs.read2 = self.registers[self.read_reg2.data]
