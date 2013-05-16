@@ -48,6 +48,7 @@ print "          'r[egister] <regnum>' to inspect value of register number <regn
 print "          'p[ort] comp.port|comp' to inspect value of a port"
 print "          'a[dvance] <expr>' advance the simulation until <expr> is true"
 print "          's[kip] <time>' skip at least <time> time units"
+print "          'm[em] <offset>'"
 print "Press Enter to advance the simulation"
 print
 
@@ -100,6 +101,9 @@ while True:
           to_skip -= sim.step()
         print
         print "Skipped ahead %i" % (int(inp) - to_skip)
+      elif cmd == 'm' or cmd == 'mem':
+        inp = int(inp)
+        print mips.dmem.mem[inp]
       else:
         raise Exception("Invalid command")
     except Exception as e:

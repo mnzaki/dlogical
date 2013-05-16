@@ -69,6 +69,11 @@ class RFormat(Instruction):
     b[SHAMT_SLICE] = self.shamt
     b[FUNCT_SLICE] = self.funct
 
+class jr(RFormat):
+  funct = 0b001000
+  def __init__(self, rs):
+    RFormat.__init__(self, 0, rs, 0)
+
 class Shifts(RFormat):
   instructions = {
     'sll': 0b000000,
@@ -92,29 +97,34 @@ class IFormat(Instruction):
     super(IFormat, self).__init__()
     self.rs = BitArray(length = 5, uint = rs)
     self.rt = BitArray(length = 5, uint = rt)
-    if callable(imm):
-      self.imm = imm()
-    else:
-      self.imm = imm
+    self.imm = imm
+  def _gen_data(self, b):
+    b[RS_SLICE] = self.rs
+    b[RT_SLICE] = self.rt
+
+    if isinstance(self.imm, Label):
+      self.imm = self.imm.relative(self)
     if self.imm > 0:
       self.imm = BitArray(length = 16, uint = self.imm)
     else:
       self.imm = BitArray(length = 16, int = self.imm)
-  def _gen_data(self, b):
-    b[RS_SLICE] = self.rs
-    b[RT_SLICE] = self.rt
+
     b[IMM_SLICE] = self.imm
 
 class FlippedIFormat(IFormat):
   instructions = {
     'beq':  0b000100,
+    'bne':  0b000101,
   }
   def __init__(self, rs, rt, imm):
     super(FlippedIFormat, self).__init__(rt, rs, imm)
+  def _gen_data(self, b):
+    super(FlippedIFormat, self)._gen_data(b)
 
 class JFormat(Instruction):
   instructions = {
-    'j': 0b000010
+    'j':   0b000010,
+    'jal': 0b000011
   }
 
   def __init__(self, address):
@@ -124,42 +134,61 @@ class JFormat(Instruction):
     else:
       self.address = address
   def _gen_data(self, b):
+    if isinstance(self.address, Label):
+      self.address = self.address.absolute()
     b[DATA_SLICE] = self.address
 
 for fmt in [RFormat, Shifts, IFormat, FlippedIFormat, JFormat]:
   for k, v in fmt.instructions.iteritems():
     fmt.new(k, v)
+ASM.instruction_set['jr'] = jr
 
 class Label(object):
   def __init__(self, pos = None):
+    self.update(pos)
+  def update(self, pos = None):
     if pos is None:
       pos = len(ASM.program)
     self.pos = pos
-  def relative(self):
-    return self.pos - len(ASM.program)
+  def relative(self, inst):
+    return self.pos - ASM.program.index(inst) - 1
   def absolute(self):
     return self.pos
-  def __call__(self):
-    return self.relative()
 
 class AssemblerEnvironment(dict):
   def label(self, name):
-    self[name] = Label()
+    if name in self:
+      self[name].update()
+    else:
+      self[name] = Label()
+
+  def define_labels(self, *args):
+    for l in args:
+      self[l] = Label()
 
   def __init__(self):
     dict.__init__(self, CLEAN_ENV)
 
+    #http://www.cs.purdue.edu/homes/hosking/502/spim/node10.html
+    self['zero'] = 0
+    self['at'] = 1
+    self['v0'] = 2
+    self['v1'] = 3
+    # registers $a0 - $a3 are 4 - 7
+    for i in xrange(4, 8):
+        self['a%d' % (i - 4)] = i
     # registers $t0 - $t7 are 8 - 15
     for i in xrange(8, 16):
         self['t%d' % (i - 8)] = i
-    # registers $t8 - $t9 are 24 - 25
-    for i in xrange(24, 26):
-        self['t%d' % (i - 16)] = i
     # registers $s0 - $s7 are 16 - 23
     for i in xrange(16, 24):
         self['s%d' % (i - 16)] = i
-    # $zero
-    self['zero'] = 0
+    # registers $t8 - $t9 are 24 - 25
+    for i in xrange(24, 26):
+        self['t%d' % (i - 16)] = i
+    # other
+    for i, reg in enumerate(['k0', 'k1', 'gp', 'sp', 'fp', 'ra']):
+      self[reg] = i + 26
 
     # Instructions
     for name, inst in ASM.instruction_set.iteritems():
@@ -168,6 +197,7 @@ class AssemblerEnvironment(dict):
     # program keeping and special cases
     self['program'] = []
     self['label'] = self.label
+    self['define_labels'] = self.define_labels
 
 class Assembler(object):
   def assemble(self, fname):

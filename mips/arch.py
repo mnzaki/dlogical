@@ -15,17 +15,19 @@ imem = Mem.with_parameters(width = 32, size = 1024)(
         write_en = 0,
         read_en = 1)
 
-control = ControlUnit(opcode = imem.read[31:26])
+control = ControlUnit(opcode = imem.read[31:26],
+                      funct  = imem.read[5:0])
 alucontrol = ALUControlUnit(aluop = control.aluop[:],
                             funct = imem.read[5:0],
                             opcode = imem.read[31:26])
 
 write_reg_mux = Mux32(in0 = imem.read[20:16], in1 = imem.read[15:11], s = control.regdst[:])
+write_reg_ra_mux = Mux32(in0 = write_reg_mux.out[:], in1 = 31, s = control.pctora[:])
 
 regs = RegisterFileSync.with_parameters(num_regs = 32, width = 32)(
         read_reg1 = imem.read[25:21],
         read_reg2 = imem.read[20:16],
-        write_reg = write_reg_mux.out[:],
+        write_reg = write_reg_ra_mux.out[:],
         write_en  = control.regwrite[:],
         clk       = clk.clk[:])
 
@@ -43,12 +45,14 @@ dmem = Mem.with_parameters(width = 32, size = 8192)(
         write_en = control.memwrite[:],
         read_en = control.memread[:])
 
-regs_write_data_mux = Mux32(in0 = alu.out[:], in1 = dmem.read[:], s = control.memtoreg[:])
+pc_add4 = Adder32(in0 = pc.d[:], in1 = 4)
 
-regs.write = regs_write_data_mux.out[:]
+regs_write_data_mux = Mux32(in0 = alu.out[:], in1 = dmem.read[:], s = control.memtoreg[:])
+regs_write_pc_mux   = Mux32(in0 = regs_write_data_mux.out[:], in1 = pc_add4.out[:], s = control.pctora[:])
+
+regs.write = regs_write_pc_mux.out[:]
 
 # Now the PC update branch
-pc_add4 = Adder32(in0 = pc.d[:], in1 = 4)
 
 address_sll2 = SLL2(inp = inst_sign_ext.out[:])
 branch_adder = Adder32(in0 = pc_add4.out[:], in1 = address_sll2.out[:])
@@ -60,5 +64,8 @@ pc_update_mux = Mux32(in0 = branch_mux.out[:],
                       in1 = Wire(pc_add4.out[31:28], jmp_sll2.out[:]),
                       s   = control.jump[:])
 
+reg_to_pc_mux = Mux32(in0 = pc_update_mux.out[:],
+                      in1 = regs.read1[:],
+                      s   = control.regtopc[:])
 # And it ends with a counter update
-pc.q = pc_update_mux.out[:]
+pc.q = reg_to_pc_mux.out[:]
